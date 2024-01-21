@@ -1,0 +1,165 @@
+PostgreSQL Python: Connect To PostgreSQL Database Server
+
+Install the psycopg2 module
+First, visit the psycopg2 package here.
+
+Second, use the following command line from the terminal:
+
+pip install psycopg2
+Code language: Shell Session (shell)
+If you have downloaded the source package into your computer, you can use the setup.py as follows:
+
+python setup.py build
+sudo python setup.py install
+Code language: Shell Session (shell)
+Create a new database
+First, log in to the PostgreSQL database server using any client tool such as pgAdmin or psql.
+
+Second, use the following statement to create a new database named suppliers in the PostgreSQL database server.
+
+CREATE DATABASE suppliers;
+Code language: SQL (Structured Query Language) (sql)
+Connect to the PostgreSQL database using the psycopg2
+To connect to the suppliers database, you use the connect() function of the psycopg2 module.
+
+The connect() function creates a new database session and returns a new instance of the connection class. By using the connection object, you can create a new cursor to execute any SQL statements.
+
+To call the connect() function, you specify the PostgreSQL database parameters as a connection string and pass it to the function like this:
+
+conn = psycopg2.connect("dbname=suppliers user=postgres password=postgres")
+Code language: SQL (Structured Query Language) (sql)
+Or you can use a list of keyword arguments:
+
+conn = psycopg2.connect(
+    host="localhost",
+    database="suppliers",
+    user="postgres",
+    password="Abcd1234")
+Code language: Python (python)
+The following is the list of the connection parameters:
+
+database: the name of the database that you want to connect.
+user: the username used to authenticate.
+password: password used to authenticate.
+host: database server address e.g., localhost or an IP address.
+port: the port number that defaults to 5432 if it is not provided.
+To make it more convenient, you can use a configuration file to store all connection parameters.
+
+The following shows the contents of the database.ini file:
+
+[postgresql]
+host=localhost
+database=suppliers
+user=postgres
+password=SecurePas$1
+Code language: Shell Session (shell)
+By using the database.ini, you can change the PostgreSQL connection parameters when you move the code to the production environment without modifying the code.
+
+Notice that if you git, you need to add the database.ini to the .gitignore file to not committing the sensitive information to the public repo like github. The .gitignore file will be like this:
+
+database.ini
+Code language: CSS (css)
+The following config() function read the database.ini file and returns connection parameters. The config() function is placed in the config.py file:
+
+#!/usr/bin/python
+from configparser import ConfigParser
+
+
+def config(filename='database.ini', section='postgresql'):
+    # create a parser
+    parser = ConfigParser()
+    # read config file
+    parser.read(filename)
+
+    # get section, default to postgresql
+    db = {}
+    if parser.has_section(section):
+        params = parser.items(section)
+        for param in params:
+            db[param[0]] = param[1]
+    else:
+        raise Exception('Section {0} not found in the {1} file'.format(section, filename))
+
+    return db
+Code language: Python (python)
+The following connect() function connects to the suppliers database and prints out the PostgreSQL database version.
+
+#!/usr/bin/python
+import psycopg2
+from config import config
+
+def connect():
+    """ Connect to the PostgreSQL database server """
+    conn = None
+    try:
+        # read connection parameters
+        params = config()
+
+        # connect to the PostgreSQL server
+        print('Connecting to the PostgreSQL database...')
+        conn = psycopg2.connect(**params)
+		
+        # create a cursor
+        cur = conn.cursor()
+        
+	# execute a statement
+        print('PostgreSQL database version:')
+        cur.execute('SELECT version()')
+
+        # display the PostgreSQL database server version
+        db_version = cur.fetchone()
+        print(db_version)
+       
+	# close the communication with the PostgreSQL
+        cur.close()
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+    finally:
+        if conn is not None:
+            conn.close()
+            print('Database connection closed.')
+
+
+if __name__ == '__main__':
+    connect()
+Code language: Python (python)
+How it works.
+
+First, read database connection parameters from the database.ini file.
+Next, create a new database connection by calling the connect() function.
+Then, create a new cursor and execute an SQL statement to get the PostgreSQL database version.
+After that, read the result set by calling the  fetchone() method of the cursor object.
+Finally, close the communication with the database server by calling the close() method of the cursor and connection objects.
+Execute the connect.py file
+To execute the connect.py file, you use the following command:
+
+python connect.py
+Code language: Shell Session (shell)
+You will see the following output:
+
+Connecting to the PostgreSQL database...
+PostgreSQL database version:
+('PostgreSQL 12.3, compiled by Visual C++ build 1914, 64-bit',)
+Database connection closed.
+Code language: Shell Session (shell)
+It means that you have successfully connected to the PostgreSQL database server.
+
+Troubleshooting
+The connect() function raises the DatabaseError exception if an error occurred. To see how it works, you can change the connection parameters in the database.ini file.
+
+For example, if you change the host to localhosts, the program will output the following message:
+
+Connecting to the PostgreSQL database...
+could not translate host name "localhosts" to address: Unknown host
+Code language: Shell Session (shell)
+The following displays error message when you change the database to a database that does not exist e.g., supplier:
+
+Connecting to the PostgreSQL database...
+FATAL: database "supplier" does not exist
+Code language: Shell Session (shell)
+If you change the user to  postgress, it will not be authenticated successfully as follows:
+
+Connecting to the PostgreSQL database...
+FATAL: password authentication failed for user "postgress"
+Code language: Shell Session (shell)
+In this tutorial, you have learned how to connect to the PostgreSQL database server from Python programs.
