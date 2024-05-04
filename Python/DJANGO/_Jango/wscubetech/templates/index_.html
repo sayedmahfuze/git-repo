@@ -1,0 +1,48 @@
+<html>
+    <head>
+        <title>{{title}}</title>
+        <style>
+            .main{
+                width: 1000px;
+                background-color: red;
+                color: white;
+                padding: auto;
+                font-size: 15px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class = "main"> {{bdata}} </div>
+        {% for n in clist%}
+        <div>{{forloop.counter}}. {{n}}</div>
+        {% endfor %}
+
+        <br/>
+        <table border="1" cellpadding="10">
+            <tr>
+                <th>Name</th>
+                <th>Phone Number</th>
+            </tr>
+            {% for d in student_details %}
+            <tr>
+                <td>{{d.name}}</td>
+                <td>{{d.phone}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        </br>
+        {% if numbers|length > 0 %}
+
+            {% for i in numbers %}
+                 <div>{{i}}</div>
+            {% endfor %}
+            
+        {% else %}
+            <h5>No Data Found</h5>
+        {% endif %}
+
+     </body>
+
+
+</html>

@@ -1,0 +1,1 @@
+# camera folder --> video folder --> panaroma --> __init__.py file

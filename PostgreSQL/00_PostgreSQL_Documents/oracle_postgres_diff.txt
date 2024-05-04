@@ -1,0 +1,38 @@
+
+ORACLE																				POSTGRES
+------------------------------------------------------------------------------ |    -----------------------------------------------------------------------------------------------
+1. Select sysdate from dual (dual supports in ORACLE)								1. select current_date 
+																					   There is no "dual" table Unlike other RDBMS, PostgreSQL allows a "select" without the "form"
+																					   clause. This use does not effect probability because the syntax to get current time is already
+																					   DBMS specific 
+																					   
+2. Outer Join - "(+)" 																2. Doesn't support outer join. The workaround is to use a union 
+
+3. SELECT product_id from inventories MINUS SELECT product_id FROM 					3. SELECT product_id FROM inventories EXCEPT SELECT product_id from order_items;
+	order_items;
+	
+4. A View can be "updatable" if some conditions are satisfied.						4. Views are read only.
+
+5. Transactions are initialted implicitily. By Default, the "auto commit"			5. BEGIN - initiates a transaction disabiling the default behavior, which is "auto-commit" enabled.
+	behavior is disable																	i.e, a commit is performed after each user statement. In Java we need to write 
+																						con.setAutoCommit(false)
+																						
+6. Interactive command prompt tool: SQL*Plus										6. Interactive command prompt tool: psql 
+
+7. Oracle permissions are granted/revoked to/from users or roles. We can create		7. PostgreSQL permissions are granted/revoked to/from  users or groups. We can create groups 
+	roles and grant/revoke roles to/from users. But we can create and alter				and then alter the groups inserting/removing users.
+	groups to insert and remove users
+	
+8. CLOB/BLOB character large objects (max 4GB)										8. TEXT (max 1GB)
+
+9. Oracle supports packages, procedures, function 									9. PostgreSQL does not have packages or procedures (only functions).
+
+10. In Oracle Tablespaces and users are dedicated to one Database 					10. In Postgres Tablespaces and users are defined at cluster level.
+	
+
+	
+ MAS -- channai
+	
+ CBE -- coimbatore
+
+ MDU -- madurai 

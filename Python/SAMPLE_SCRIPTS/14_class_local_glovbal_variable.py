@@ -1,0 +1,125 @@
+# Function 
+# Argument Types 
+	. Positional  Argument
+	def f1(name):
+		print(name)
+	f1('UMA')
+
+	. Keyword Argument 
+	def f2(name):
+		print(name)
+	f2(name='UMA')
+
+	. Default Argument 
+	def f3(name, dept = 'Soft'):
+		print(f'Name of the Employer {name}, department {dept}')
+
+	def f3('UMA')
+
+	. Variable Length Argument
+	def f4(*args):
+		for i in args:
+			print(i)
+
+	f4(1, 2, 3, 4, 5)
+
+	. Variable Keyword Length Argument
+	def f5(**args):
+		for key, value in args.items():
+			print(f'Key: {key}  Value: {value}')
+
+	f5(name='UMA', loc = 'BBS')
+
+
+# Module 
+# Package (Basic)
+
+# TYPES OF VARIABLE
+
+def cal(num1, num2):
+	result = num1 + num2 
+	return result 
+
+result = cal(4, 5)
+print(result)
+
+
+# TYPES OF VARIABLE
+
+def cal(num1, num2):
+	a_result = num1 + num2 
+	print(id(a_result))
+	return a_result # 9 
+	
+
+print(type(cal))
+result = cal(4, 5) #9 
+print(id(result))
+print(result)
+
+
+# LOCAL VARIABLE 
+a = 10  # Global Variable 
+
+def f1(num1, num2):
+	b = 5# Local Variable 
+	result = num1 + num2 + a + b
+	return(result)
+
+
+res = f1(20, 4)
+print(res)
+print(a)
+print(b)
+
+
+a = 10 
+
+def f1(num1, num2):
+	a = 5
+	result = num1 + num2 + a + globals()['a']
+	return result
+
+res = f1(2, 5)
+print(res)
+
+
+
+# GLOBAL VARIABLE 
+def total(**args):
+	global obtain_marks
+	obtain_marks = 0
+	for key, value in args.items():
+		print(f'Subject: {key}   marks: {value}')
+		obtain_marks += value
+	print(f'Total Marks: {obtain_marks}')
+
+def get_percentage(total_marks, obtain_marks):
+	print ( (obtain_marks / total_marks) * 100)
+
+total(math=80, eng=70, hin=66, sinc = 89, his=75, geo=55)
+
+get_percentage(600, obtain_marks)
+
+
+
+a = 10 
+
+def f1(n1, n2):
+	a = 5 
+	print(globals()['a']) # 10
+	print(a)# 5
+
+f1(3, 4)
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,22 @@
+{"employees":[
+    {"name":"Sonoo", "email":"sonoojaiswal1987@gmail.com"},
+    {"name":"Rahul", "email":"rahul32@gmail.com"},
+    {"name":"John", "email":"john32bob@gmail.com"}
+]}
+
+[
+  {
+    "PizzaName": "Country Feast",
+    "Base": "Cheese burst",
+    "Toppings":["Jalepenos", "Black Olives", "Extra cheese", "Sausages", "Cherry tomatoes"],
+    "Spicy":"yes",
+    "Veg":"yes"
+  },
+  {
+    "PizzaName":"Veggie Paradise",
+    "Base":"Thin crust",
+    "Toppings":["Jalepenos", "Black Olive", "Grilled Mashrooms", "Onion", "Cherry tomatoes"],
+    "Spicy":"yes",
+    "Veg":"yes"
+  }
+]

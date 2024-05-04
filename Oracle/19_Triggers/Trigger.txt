@@ -1,0 +1,72 @@
+--# Oracle Triggers:
+A Triggers is like a store proedure that Oracle Database invokes automatically whenever a specific event occurs.
+Note: The Database can detect only system-defined events.
+	  We cannot define our own events.
+	  
+9.1 Overview of Triggers:
+	Like a stored procedure a trigger is a named PL/SQL unit that is stored in the databse abd can be invoked repeatedly.
+	Unlike a store procedure, we can enable and disbale a trigger, but we can not explicitly invoke it.
+	
+	While a trigger is enabled, the databse automatically invokes it-that is, the trigger fires--whenever its triggering event occers. While a trigger is disable it does not fire.
+	
+	The trigger is said to be created on or defined on the item, which is either a table , a view, a schema, or the database.
+	
+	By default, a trigger is created in the enabled state.
+	
+	If the trigger is created on a table or view, then the triggering event is composed of DML statements, and the trigger is called a DML trigger.
+	
+	A crossedition trigger is a DML trigger for use only in edition-based redefinition.
+	
+	If the trigger is created on a schema or the database, then the triggering event is composed of wither DDL or Database operation statements, and the trigger is called a system trigger.
+		Queries in the trigger see the current read-consistent materiazed view of referenced tables and any data changed in the same transaction.
+		Updates in the trigger wait for existing data lock to be released before processing.
+	
+	An INSTEAD IF TRIGGER is either:
+	. A DML trigger created on either a noneditioning view or a nedted table column of a noneditioning view.
+	. A system trigger defined on a CREATE statement.
+	
+9.3 DML Triggers:
+	A DML trigger is created on either a table or view, and its triggering event is composed of the DML statements DELETE, INSERT and UPDATE.
+	
+	To create a trigger that fires in response to a MERGE statmeent, create trigger on the INSERT and UPDATE statement to which the MERGE operation decomposes.
+	
+	A DML trigger either a simple or compound.
+	
+	A Simple DML trigger fires at exactly one of these timing points:
+	. Before the triggering statement runs
+	. After the triggering statement runs 
+	. Before each row that the triggering statement affects 
+	. After each row that the triggering statement affects. 
+	
+	A compound DML trigger created on a table or editioning view can fire at one, some, or all of the precedsing timing points. 
+	
+	
+9.3.1 Conditional Predicts for Detecting Triggering DML Statements 
+
+	INSERTING An INSERT statement fired the trigger.
+	UPDATING An UPDATE statement fired the trigger.
+	UPDATING ('column') An UPDATE statement that affected the specified column fired the trigger.
+	DELETING A DELETE statement fired the trigger.
+	
+	Example 9-1 Trigger uses Conditional Predictions to Detect Triggering Statement
+	
+	CREATE OR REPLACE TRIGGER t 
+		BEFORE 
+			INSERT OR 
+			UPDATE OF slary, department_id OR 
+			DELETE 
+		ON employees 
+	BEGIN 
+		CASE 
+			WHEN INSERTING THEN 
+				DBMS_OUTPUT.PUT_LINE('Inserting');
+			WHEN UPDATING('salary') THEN 
+				DBMS_OUTPUT.PUT_LINE('Updating Salary');
+			WHEN UPDATING('department_id') THEN 
+				DBMS_OUTPUT.PUT_LINE('Updating department ID');
+			WHEN DELETING  THEN 
+				DBMS_OUTPUT.PUT_LINE('Deleting');
+		END CASE;
+	END;
+
+	 

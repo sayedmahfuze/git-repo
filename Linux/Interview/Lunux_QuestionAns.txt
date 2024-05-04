@@ -1,0 +1,191 @@
+10. Add prefix to all files in a directory unix_ using mv command
+To add a prefix "unix_" to all files in a directory using the mv command, you can use a combination of for 
+loop and mv command.
+
+Here's an example command to add the prefix "unix_" to all files in the current directory:
+
+for file in *; do mv "$file" "unix_$file"; done
+This command uses a for loop to iterate over all files in the current directory (*), and for each file, it 
+renames it using the mv command with the prefix "unix_". The "$file" variable is used to refer to the current 
+file name, and it's enclosed in double quotes to handle file names with spaces or special characters.
+
+If you want to add the prefix to files in a specific directory, you can replace the * in the command with the 
+path to the directory you want to target. For example, to add the prefix "unix_" to all files in the /home/user/data 
+directory, you would use the following command:
+
+for file in /home/user/data/*; do mv "$file" "/home/user/data/unix_$file"; done
+This command uses the for loop to iterate over all files in the /home/user/data directory (/home/user/data/*), 
+and for each file, it renames it using the mv command with the prefix "unix_". The new file names include the full 
+path, so we need to specify the path to the new location in the mv command as well.
+
+9. Grep only word from files for matched pattern
+grep -wE "example|test" file.txt
+
+To grep only whole words from files for a matched pattern, you can use the -w option with the grep command. 
+The -w option matches only those lines that contain the pattern as a whole word. Here's an example:
+
+grep -w "example" file.txt
+In this example, grep will search for the word "example" in the file file.txt and return only those lines that 
+contain the word "example" as a whole word. If the file contains lines like "this is an example" or 
+"examples are helpful", grep will not return those lines because "example" is not a whole word in those lines.
+
+You can also use wildcards or regular expressions with the -w option to search for multiple patterns that are whole words. 
+For example:
+grep -wE "example|test" file.txt
+This command will search for lines in file.txt that contain either the whole word "example" or the whole word "test". 
+The -E option enables extended regular expressions, which allows you to use the | symbol to search for multiple patterns.
+
+
+1. Rename file
+To rename a file in Linux, you can use the mv command (short for "move"). Here's the basic syntax:
+
+mv old_file_name new_file_name
+For example, to rename a file called file1.txt to new_file.txt, you would use the following command:
+
+mv file1.txt new_file.txt
+Note that if the file new_file.txt already exists, it will be overwritten by the renamed file. If you want to keep a copy 
+of the original file, you should make a backup before renaming it.
+
+You can also use mv to move a file to a different directory while renaming it. For example, to move file1.txt 
+to a directory called myfiles and rename it to new_file.txt, you would use the following command:
+
+mv file1.txt myfiles/new_file.txt
+This will move file1.txt to the myfiles directory and rename it to new_file.txt.
+
+
+2. Replace a string by another string in a file from line 10 to 20 in the file itself instead of displaying to console
+To replace a string by another string in a file from line 10 to 20 in the file itself instead of displaying to console in 
+Linux, you can use the sed command with the -i option. The -i option tells sed to edit the file in place, meaning that the 
+changes will be made directly in the file.
+
+Here's an example command that replaces all occurrences of "oldstring" with "newstring" in a file called file.txt 
+from line 10 to line 20:
+
+sed -i '10,20s/oldstring/newstring/g' file.txt
+This command uses the s command in sed to substitute "oldstring" with "newstring" on lines 10 to 20 of the file file.txt. 
+The g flag at the end of the command tells sed to replace all occurrences of the string on each line, not just the first one.
+
+Note that the changes will be made directly to the file, so make sure to backup the file before running the sed command if 
+you want to preserve the original content.
+
+
+
+3. Sort disk space usage command o/p in human readable format.
+To sort disk space usage command output in human-readable format, you can use the du (disk usage) command with the -h 
+(human-readable) option, and pipe its output to the sort command.
+
+Here's an example command to sort the disk space usage of files and directories in the current directory:
+
+du -h | sort -h
+This command will show the disk space usage of all files and directories in the current directory in human-readable format, 
+sorted by size in ascending order. The -h option makes the output human-readable, and the sort -h command sorts the output 
+by size in a way that takes into account the units used (KB, MB, GB, etc.).
+
+If you want to sort the output in descending order, you can add the -r (reverse) option to the sort command:
+
+du -h | sort -hr
+This command will show the disk space usage of all files and directories in the current directory in human-readable format, 
+sorted by size in descending order.
+
+
+
+4. Find a file in a location which ends with .sql
+To find a file in a location which ends with .sql, you can use the find command with the -name option and a wildcard (*) 
+to match any filename that ends with .sql.
+
+Here's an example command to find all files with the .sql extension in the current directory and its subdirectories:
+
+find . -name "*.sql"
+This command searches for all files that have a .sql extension in the current directory (represented by the .) 
+and all its subdirectories. The -name option tells find to match only files whose name matches the specified pattern. 
+The * wildcard matches any number of characters, so *.sql matches any filename that ends with .sql.
+
+If you want to limit the search to a specific directory, you can replace the . in the command with the path to the 
+directory you want to search. For example, to search for .sql files in the /home/user/data directory, you would use 
+the following command:
+
+find /home/user/data -name "*.sql"
+This command searches for all .sql files in the /home/user/data directory and its subdirectories.
+
+
+5. Find a file in entire directory which has timestamp greater than yesterday
+To find a file in an entire directory which has a timestamp greater than yesterday, you can use the find command with 
+the -newermt option and a reference date.
+
+Here's an example command to find all files in the current directory and its subdirectories that have a modification 
+time greater than yesterday:
+
+find . -type f -newermt "yesterday" -print
+This command searches for all regular files (-type f) in the current directory (represented by the .) and its 
+subdirectories that have a modification time newer than yesterday (-newermt "yesterday"). The -print option tells find 
+to print the matching file names to the console.
+
+If you want to limit the search to a specific directory, you can replace the . in the command with the path to the 
+directory you want to search. For example, to search for files in the /home/user/data directory that have a modification 
+time greater than yesterday, you would use the following command:
+
+find /home/user/data -type f -newermt "yesterday" -print
+This command searches for all regular files in the /home/user/data directory and its subdirectories that have a 
+modification time newer than yesterday, and prints their names to the console.
+
+
+6. Display the 3rd field from the file
+To display the 3rd field from a file, you can use the awk command with the print statement.
+
+Here's an example command to print the 3rd field from a file called data.txt:
+
+awk '{print $3}' data.txt
+This command uses awk to process the lines in the data.txt file, and the {print $3} statement tells awk to print the 
+3rd field from each line. The fields are separated by whitespace by default, so $3 refers to the third word on each line.
+
+If the fields in your file are separated by a different character, you can specify the field separator using the -F option. 
+For example, if the fields in your file are separated by commas, you would use the following command:
+
+awk -F',' '{print $3}' data.txt
+This command sets the field separator to , using the -F option, and prints the 3rd field from each line.
+
+
+
+7. Find files in a directory with size greater than 5k
+To find files in a directory with a size greater than 5k in Linux, you can use the find command with the -size option 
+and a reference size.
+
+Here's an example command to find all files in the current directory and its subdirectories with a size greater than 5k:
+
+find . -type f -size +5k -print
+This command searches for all regular files (-type f) in the current directory (represented by the .) and its 
+subdirectories that have a size greater than 5k (-size +5k). The + sign before 5k means "greater than", so this will 
+match all files that are larger than 5k. The -print option tells find to print the matching file names to the console.
+
+If you want to limit the search to a specific directory, you can replace the . in the command with the path to the 
+directory you want to search. For example, to search for files in the /home/user/data directory that have a size 
+greater than 5k, you would use the following command:
+
+find /home/user/data -type f -size +5k -print
+This command searches for all regular files in the /home/user/data directory and its subdirectories that have a size 
+greater than 5k, and prints their names to the console.
+
+
+8. Find all files in a directory which has string city
+To find all files in a directory which have the string "city" in their names, you can use the find command with the -name 
+option and a pattern.
+
+Here's an example command to find all files in the current directory and its subdirectories which have the string "city" 
+in their names:
+
+find . -type f -name "*city*"
+This command searches for all regular files (-type f) in the current directory (represented by the .) and its 
+subdirectories which have the string "city" in their names (-name "*city*"). The * before and after "city" are 
+wildcards that match any characters before or after the string.
+
+If you want to limit the search to a specific directory, you can replace the . in the command with the path to the 
+directory you want to search. For example, to search for files in the /home/user/data directory which have the 
+string "city" in their names, you would use the following command:
+
+find /home/user/data -type f -name "*city*"
+This command searches for all regular files in the /home/user/data directory and its subdirectories which have the 
+string "city" in their names, and prints their names to the console.
+
+
+
+

@@ -1,0 +1,493 @@
+# Triggers:
+Like a stored procedure, a trigger is a named PL/SQL unit that is stored in the database and
+can be invoked repeatedly. Unlike a stored procedure, you can enable and disable a trigger,
+but you cannot explicitly invoke it.
+While a trigger is enabled, the database automatically invokes it—that is, the trigger fires—
+whenever its triggering event occurs. While a trigger is disabled, it does not fire.
+
+If the trigger is created on a table or view, then the triggering event is composed of
+DML statements DELETE, INSERT, and UPDATE, and the trigger is called a DML trigger
+
+If the trigger is created on a schema or the database, then the triggering event is
+composed of either DDL or database operation statements, and the trigger is called a
+system trigger.
+
+A conditional trigger is a DML or system trigger that has a WHEN clause that specifies
+a SQL condition that the database evaluates for each row that the triggering statement
+affects.
+
+An INSTEAD OF trigger is either:
+• A DML trigger created on either a noneditioning view or a nested table column of a
+noneditioning view
+• A system trigger defined on a CREATE statement
+The database fires the INSTEAD OF trigger instead of running the triggering statement.
+
+Triggers let you customize your database management system.
+For example, you can use triggers to:
+• Automatically generate virtual column values
+• Log events
+• Gather statistics on table access
+• Modify table data when DML statements are issued against views
+• Enforce referential integrity when child and parent tables are on different nodes of a
+distributed database
+• Publish information about database events, user events, and SQL statements to
+subscribing applications
+• Prevent DML operations on a table after regular business hours
+• Prevent invalid transactions
+• Enforce complex business or referential integrity rules that you cannot define with
+constraints.
+
+-------------------------------------------------------------------------------------
+# Packages 
+
+What is a Package?
+A package is a schema object that groups logically related PL/SQL types, variables,
+constants, subprograms, cursors, and exceptions. A package is compiled and stored in the
+database, where many applications can share its contents.
+A package always has a specification, which declares the public items that can be
+referenced from outside the package.
+If the public items include cursors or subprograms, then the package must also have a body.
+The body must define queries for public cursors and code for public subprograms. The body
+can also declare and define private items that cannot be referenced from outside the
+package, but are necessary for the internal workings of the package. Finally, the body can
+have an initialization part, whose statements initialize variables and do other one-time setup
+steps, and an exception-handling part. You can change the body without changing the
+specification or the references to the public items; therefore, you can think of the package
+body as a black box.
+
+The ACCESSIBLE BY clause of the package specification lets you specify a white list of
+PL/SQL units that can access the package.
+
+The values of the variables, constants, and cursors that a package declares (in either its
+specification or body) comprise its package state.
+If a PL/SQL package declares at least one variable, constant, or cursor, then the package is
+stateful; otherwise, it is stateless.
+
+
+----------------------------------------------------------------------------------------
+
+# Exception 
+
+Exceptions (PL/SQL runtime errors) can arise from design faults, coding mistakes, hardware
+failures, and many other sources. You cannot anticipate all possible exceptions, but you can
+write exception handlers that let your program to continue to operate in their presence.
+Any PL/SQL block can have an exception-handling part, which can have one or more
+exception handlers.
+
+Exception Categories
+The exception categories are:
+• Internally defined
+The runtime system raises internally defined exceptions implicitly (automatically).
+Examples of internally defined exceptions are ORA-00060 (deadlock detected
+while waiting for resource) and ORA-27102 (out of memory).
+An internally defined exception always has an error code, but does not have a
+name unless PL/SQL gives it one or you give it one.
+Example 11-5 Naming Internally Defined Exception
+DECLARE
+deadlock_detected EXCEPTION;
+PRAGMA EXCEPTION_INIT(deadlock_detected, -60);
+BEGIN
+...
+EXCEPTION
+WHEN deadlock_detected THEN
+...
+END;
+/
+
+• Predefined
+A predefined exception is an internally defined exception that PL/SQL has given a
+name. For example, ORA-06500 (PL/SQL: storage error) has the predefined name
+STORAGE_ERROR.
+Predefined exceptions are internally defined exceptions that have predefined names, which
+PL/SQL declares globally in the package STANDARD. The runtime system raises predefined
+exceptions implicitly (automatically). Because predefined exceptions have names, you can
+write exception handlers specifically for them
+(ACCESS_INTO_NULL -6530
+CASE_NOT_FOUND -6592
+COLLECTION_IS_NULL -6531
+CURSOR_ALREADY_OPEN -6511
+DUP_VAL_ON_INDEX -1
+INVALID_CURSOR -1001
+INVALID_NUMBER -1722
+LOGIN_DENIED -1017
+NO_DATA_FOUND +100
+NO_DATA_NEEDED -6548
+NOT_LOGGED_ON -1012
+PROGRAM_ERROR -6501
+ROWTYPE_MISMATCH -6504
+SELF_IS_NULL -30625
+STORAGE_ERROR -6500
+SUBSCRIPT_BEYOND_COUNT -6533
+SUBSCRIPT_OUTSIDE_LIMIT -6532
+SYS_INVALID_ROWID -1410
+TIMEOUT_ON_RESOURCE -51
+TOO_MANY_ROWS -1422
+VALUE_ERROR -6502
+ZERO_DIVIDE -1476)
+
+• User-defined
+You can declare your own exceptions in the declarative part of any PL/SQL
+anonymous block, subprogram, or package. For example, you might declare an
+exception named insufficient_funds to flag overdrawn bank accounts.
+You must raise user-defined exceptions explicitly.
+An exception name declaration has this syntax:
+exception_name EXCEPTION;
+
+Raising User-Defined Exception with RAISE Statement
+CREATE PROCEDURE account_status (
+due_date DATE,
+today DATE
+) AUTHID DEFINER
+IS
+past_due EXCEPTION; -- declare exception
+BEGIN
+IF due_date < today THEN
+RAISE past_due; -- explicitly raise exception
+END IF;
+EXCEPTION
+WHEN past_due THEN -- handle exception
+DBMS_OUTPUT.PUT_LINE ('Account past due.');
+END;
+/
+BEGIN
+account_status (TO_DATE('01-JUL-2010', 'DD-MON-YYYY'),
+TO_DATE('09-JUL-2010', 'DD-MON-YYYY'));
+END;
+/
+ou can invoke the RAISE_APPLICATION_ERROR procedure (defined in the
+DBMS_STANDARD package) only from a stored subprogram or method. Typically, you
+invoke this procedure to raise a user-defined exception and return its error code and
+error message to the invoker.
+To invoke RAISE_APPLICATION_ERROR, use this syntax:
+RAISE_APPLICATION_ERROR (error_code, message[, {TRUE | FALSE}]);
+
+You must have assigned error_code to the user-defined exception with the EXCEPTION_INIT
+pragma. The syntax is:
+PRAGMA EXCEPTION_INIT (exception_name, error_code)
+
+Raising User-Defined Exception with RAISE_APPLICATION_ERROR
+CREATE PROCEDURE account_status (
+due_date DATE,
+today DATE
+) AUTHID DEFINER
+IS
+BEGIN
+IF due_date < today THEN -- explicitly raise exception
+RAISE_APPLICATION_ERROR(-20000, 'Account past due.');
+END IF;
+END;
+/
+DECLARE
+past_due EXCEPTION; -- declare exception
+PRAGMA EXCEPTION_INIT (past_due, -20000); -- assign error code to exception
+BEGIN
+account_status (TO_DATE('01-JUL-2010', 'DD-MON-YYYY'),
+TO_DATE('09-JUL-2010', 'DD-MON-YYYY')); -- invoke procedure
+EXCEPTION
+WHEN past_due THEN -- handle exception
+DBMS_OUTPUT.PUT_LINE(TO_CHAR(SQLERRM(-20000)));
+END;
+/
+
+Exception Propagation
+If an exception is raised in a block that has no exception handler for it, then the exception
+propagates. That is, the exception reproduces itself in successive enclosing blocks until
+either a block has a handler for it or there is no enclosing block. If there is no handler for the
+exception, then PL/SQL returns an unhandled exception error to the invoker or host
+
+In an exception handler, for the exception being handled:
+• You can retrieve the error code with the PL/SQL function SQLCODE, described in
+"SQLCODE Function".
+• You can retrieve the error message with either:
+– The PL/SQL function SQLERRM, described in "SQLERRM Function
+
+
+-----------------------------------------------------------------------------
+
+# Data Types :
+Every PL/SQL constant, variable, parameter, and function return value has a data type that
+determines its storage format and its valid values and operations.
+A scalar data type can have subtypes. A subtype is a data type that is a subset of another
+data type, which is its base type. A subtype has the same valid operations as its base type.
+A data type and its subtypes comprise a data type family.
+PL/SQL predefines many types and subtypes in the package STANDARD and lets you define
+your own subtypes.
+The PL/SQL scalar data types are:
+• The SQL data types
+• BOOLEAN
+• PLS_INTEGER
+• BINARY_INTEGER
+• REF CURSOR
+• User-defined subtypes
+User-Defined Unconstrained Subtypes Show Intended Use
+In this example, the unconstrained subtypes Balance and Counter show the intended
+uses of data items of their types.
+DECLARE
+SUBTYPE Balance IS NUMBER;
+checking_account Balance(6,2);
+savings_account Balance(8,2);
+certificate_of_deposit Balance(8,2);
+max_insured CONSTANT Balance(8,2) := 250000.00;
+SUBTYPE Counter IS NATURAL;
+accounts Counter := 1;
+deposits Counter := 0;
+withdrawals Counter := 0;
+overdrafts Counter := 0;
+PROCEDURE deposit (
+account IN OUT Balance,
+amount IN Balance
+) IS
+BEGIN
+account := account + amount;
+deposits := deposits + 1;
+END;
+BEGIN
+NULL;
+END;
+/
+
+-------------------------------------------------------------------
+# Control Statements 
+PL/SQL has three categories of control statements: conditional selection statements, loop
+statements and sequential control statements.
+PL/SQL categories of control statements are:
+• Conditional selection statements, which run different statements for different data
+values.
+The conditional selection statements are IF and CASE.
+• Loop statements, which run the same statements with a series of different data values.
+The loop statements are the basic LOOP, FOR LOOP, and WHILE LOOP.
+The EXIT statement transfers control to the end of a loop. The CONTINUE statement exits
+the current iteration of a loop and transfers control to the next iteration. Both EXIT and
+CONTINUE have an optional WHEN clause, where you can specify a condition.
+• Sequential control statements, which are not crucial to PL/SQL programming.
+The sequential control statements are GOTO, which goes to a specified statement, and
+NULL, which does nothing.
+
+-------------------------------------------------------------------------------------------
+# Collection Data Types 
+PL/SQL lets you define two kinds of composite data types: collection and record.
+A composite data type stores values that have internal components. 
+
+In a collection, the internal components always have the same data type, and are called
+elements. You can access each element of a collection variable by its unique index, with this
+syntax: variable_name(index). To create a collection variable, you either define a collection
+type and then create a variable of that type or use %TYPE.
+In a record, the internal components can have different data types, and are called fields. You
+can access each field of a record variable by its name, with this syntax:
+variable_name.field_name. To create a record variable, you either define a RECORD type and
+then create a variable of that type or use %ROWTYPE or %TYPE.
+You can create a collection of records, and a record that contains collections.
+
+.Dense or Sparse
+A dense collection has no gaps between elements—every element between the first and
+last element is defined and has a value (the value can be NULL unless the element has a NOT
+NULL constraint). A sparse collection has gaps between elements.
+
+.Associative Arrays:
+An associative array (formerly called PL/SQL table or index-by table) is a set of
+key-value pairs. Each key is a unique index, used to locate the associated value with
+the syntax variable_name(index).
+The data type of index can be either a string type (VARCHAR2, VARCHAR, STRING, or
+LONG) or PLS_INTEGER. Indexes are stored in sort order, not creation order. For string
+types, sort order is determined by the initialization parameters NLS_SORT and NLS_COMP.
+-- Associative array indexed by string:
+TYPE population IS TABLE OF NUMBER -- Associative array type
+INDEX BY VARCHAR2(64); -- indexed by string
+city_population population; -- Associative array variable
+
+.Varray:
+A varray (variable-size array) is an array whose number of elements can vary from
+zero (empty) to the declared maximum size.
+To access an element of a varray variable, use the syntax variable_name(index). The
+lower bound of index is 1; the upper bound is the current number of elements. The
+upper bound changes as you add or delete elements, but it cannot exceed the
+maximum size. When you store and retrieve a varray from the database, its indexes
+and element order remain stable.
+
+TYPE Foursome IS VARRAY(4) OF VARCHAR2(15); -- VARRAY type
+-- varray variable initialized with constructor:
+team Foursome := Foursome('John', 'Mary', 'Alberto', 'Juanita');
+
+.Nested Table:
+In the database, a nested table is a column type that stores an unspecified number of
+rows in no particular order.
+When you retrieve a nested table value from the database into a PL/SQL nested table
+variable, PL/SQL gives the rows consecutive indexes, starting at 1. Using these
+indexes, you can access the individual rows of the nested table variable. The syntax is
+variable_name(index). The indexes and row order of a nested table might not remain
+stable as you store and retrieve the nested table from the database.
+TYPE Roster IS TABLE OF VARCHAR2(15); -- nested table type
+-- nested table variable initialized with constructor:
+names Roster := Roster('D Caruso', 'J Hamil', 'D Piro', 'R Singh');
+
+-------------------------------------------------------------------------------------
+
+# Cursors Overview 
+A cursor is a pointer to a private SQL area that stores information about processing a
+specific SELECT or DML statement.
+A session cursor lives in session memory until the session ends, when it ceases to exist.
+A cursor that is constructed and managed by PL/SQL is an implicit cursor. A cursor
+that you construct and manage is an explicit cursor.
+You can get information about any session cursor from its attributes (which you can
+reference in procedural statements, but not in SQL statements).
+
+An implicit cursor is a session cursor that is constructed and managed by PL/SQL. PL/SQL
+opens an implicit cursor every time you run a SELECT or DML statement. You cannot control
+an implicit cursor, but you can get information from its attributes.
+The implicit cursor attributes are:
+• SQL%ISOPEN Attribute: Is the Cursor Open?
+• SQL%FOUND Attribute: Were Any Rows Affected?
+• SQL%NOTFOUND Attribute: Were No Rows Affected?
+• SQL%ROWCOUNT Attribute: How Many Rows Were Affected?
+
+An explicit cursor is a session cursor that you construct and manage. You must declare and
+define an explicit cursor, giving it a name and associating it with a query (typically, the query
+returns multiple rows). Then you can process the query result set in either of these ways:
+• Open the explicit cursor (with the OPEN statement), fetch rows from the result set (with the
+FETCH statement), and close the explicit cursor (with the CLOSE statement).
+• Use the explicit cursor in a cursor FOR LOOP statement
+
+To create a cursor variable, either declare a variable of the predefined type
+SYS_REFCURSOR or define a REF CURSOR type and then declare a variable of that type.
+The basic syntax of a REF CURSOR type definition is:
+TYPE type_name IS REF CURSOR [ RETURN return_type ]
+
+If you specify return_type, then the REF CURSOR type and cursor variables of that type
+are strong; if not, they are weak. SYS_REFCURSOR and cursor variables of that type are
+weak.
+With a strong cursor variable, you can associate only queries that return the specified
+type. With a weak cursor variable, you can associate any query.
+
+----------------------------------------------------------------------------------
+# PL/SQL Dynamic SQL 
+Dynamic SQL is a programming methodology for generating and running SQL statements at
+run time.
+It is useful when writing general-purpose and flexible programs like ad hoc query systems,
+when writing programs that must run database definition language (DDL) statements, or
+when you do not know at compile time the full text of a SQL statement or the number or data
+types of its input and output variables.
+
+PL/SQL provides two ways to write dynamic SQL:
+• Native dynamic SQL, a PL/SQL language (that is, native) feature for building and running
+dynamic SQL statements
+• DBMS_SQL package, an API for building, running, and describing dynamic SQL statements
+
+Native dynamic SQL processes most dynamic SQL statements with the EXECUTE
+IMMEDIATE statement.
+If the dynamic SQL statement is a SELECT statement that returns multiple rows, native
+dynamic SQL gives you these choices:
+• Use the EXECUTE IMMEDIATE statement with the BULK COLLECT INTO clause.
+• Use the OPEN FOR, FETCH, and CLOSE statements.
+The SQL cursor attributes work the same way after native dynamic SQL INSERT,
+UPDATE, DELETE, MERGE, and single-row SELECT statements as they do for their static
+SQL counterparts
+--------------------------------------------------------------------------------------------------
+Questions
+--------------------------------------------------------------------------------------------------
+1: What is the SQL Query used for Creating a Database and a Table?
+
+CREATE DATABASE testdb
+   USER SYS IDENTIFIED BY sys_password
+   USER SYSTEM IDENTIFIED BY system_password
+   LOGFILE GROUP 1 ('/u01/logs/my/redo01a.log','/u02/logs/my/redo01b.log') SIZE 100M,
+           GROUP 2 ('/u01/logs/my/redo02a.log','/u02/logs/my/redo02b.log') SIZE 100M,
+           GROUP 3 ('/u01/logs/my/redo03a.log','/u02/logs/my/redo03b.log') SIZE 100M
+   MAXLOGHISTORY 1
+   MAXLOGFILES 16
+   MAXLOGMEMBERS 3
+   MAXDATAFILES 1024
+   CHARACTER SET AL32UTF8
+   NATIONAL CHARACTER SET AL16UTF16
+   EXTENT MANAGEMENT LOCAL
+   DATAFILE '/u01/app/oracle/oradata/mynewdb/system01.dbf'
+     SIZE 700M REUSE AUTOEXTEND ON NEXT 10240K MAXSIZE UNLIMITED
+   SYSAUX DATAFILE '/u01/app/oracle/oradata/mynewdb/sysaux01.dbf'
+     SIZE 550M REUSE AUTOEXTEND ON NEXT 10240K MAXSIZE UNLIMITED
+   DEFAULT TABLESPACE users
+      DATAFILE '/u01/app/oracle/oradata/mynewdb/users01.dbf'
+      SIZE 500M REUSE AUTOEXTEND ON MAXSIZE UNLIMITED
+   DEFAULT TEMPORARY TABLESPACE tempts1
+      TEMPFILE '/u01/app/oracle/oradata/mynewdb/temp01.dbf'
+      SIZE 20M REUSE AUTOEXTEND ON NEXT 640K MAXSIZE UNLIMITED
+   UNDO TABLESPACE undotbs1
+      DATAFILE '/u01/app/oracle/oradata/mynewdb/undotbs01.dbf'
+      SIZE 200M REUSE AUTOEXTEND ON NEXT 5120K MAXSIZE UNLIMITED
+   USER_DATA TABLESPACE usertbs
+      DATAFILE '/u01/app/oracle/oradata/mynewdb/usertbs01.dbf'
+      SIZE 200M REUSE AUTOEXTEND ON MAXSIZE UNLIMITED;
+ 
+-- Table 
+CREATE TABLE <table_name>(
+<column_name1> <datatype> (size),
+<column_name2> <datatype> (size),
+<column_name3> <datatype> (size),
+<column_name4> <datatype> ) ;
+
+
+ 
+2: What is the SQL query used to create a table with same structure of 
+   another table?
+Ans: Here table structure can be an empty structure or can be a structure with data.
+sql> CREATE TABLE sample_table as 
+	 (SELECT * from emp 
+	 WHERE 1 = 2);  --# Will create an empty structure 
+sql> CREATE TABLE sample_table as 
+	 (select empno, ename, sal from emp) --# Will create an table with specified column with the data.
+
+	
+
+4: What is the SQL query used to find the 2nd / 3rd / nth highest Salary?
+sql> select sal from (
+		select sal, rownum as rn from (
+			(select distinct sal from emp order by sal desc)
+			)	 
+		)
+	 where rn=2;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

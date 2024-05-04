@@ -1,0 +1,1064 @@
+--# Chapter 4 
+--# PL/SQL Control Statements 
+	PL/SQL has three catagories of control statements:
+	. Conditional Selection Statement 
+	. Loop statements 
+	. SequentialControl Statement.
+	
+	. Conditional Selection Statement, which run different statements for different data values.
+	  The conditional selection statements are IF and CASE.
+	  
+	. Loop Stateements, which run the same statements with a series of different data vales.
+	  The loop statements are the basic LOOP, FOR LOOP, and WHILE LOOP.
+	  The EXIT statement transfers control to the end of a loop. The CONTINUE statement exits
+	  the current iteration of the loop and transfers control to the next iteration. Both EXIT and 
+	  CONTINUE have an opetional WHEN caluse, where we can specify a condition.
+	  
+	. Sequential control statement, which are not crucial to PL/SQL programming.
+      The sequential control statement are GOTO, which goes to a specified statement, and 
+      NULL, which does nothing.
+
+4.1 Conditional Selection Statements 
+	The conditional selection statements, IF and CASE, run different statements for different 
+	data values.
+	
+	The IF statement either runs or skips a sequence of one or more statements, depending on  a 
+	condition. THe IF Statement has these forms:
+	. IF THEN 
+	. IF THEN ELSE 
+	. IF THEN ELSIF 
+	
+	The CASE Statement choose from a sequence of conditions, and runs the correcponding statement.
+	The CASE statement has thes forms:
+	. Simple, which evaluations a single expression and compares it to  a seval potential values.
+	. Searched, which evaluates multiple conditions and chooses the first one that is true.
+	The CASE statement is appropriate when a different action is to be taken for each alternative.
+	
+	
+4.1.1 IF THEN Statemet 
+	The IF THEN statement either runs or skips a sequence of one or more statements,
+	depending on a condition. 
+	Structure:
+	IF condition THEN 
+		Statements 
+	END IF; 
+	
+	if the condition is true, the statements run; otherwise the IF statement does nothing.
+	
+	Tip:
+	**********************************************************
+	Avoid clumsy IF Statement such as:
+	
+	IF new_balance < minimum_lanance THEN 
+		overdrawn := TRUE;
+	ELSE:
+		overdrawn := FALSE;
+	END IF;
+	
+	Instead, assign the value of the BOOLEAN expression directly to a BOOLEAN  variable:
+	
+	overdrawn := new_balance < minimum_balance;
+	
+	A BOOLEAN variable is either TRUE, FALSE, or NULL Do not wite:
+	
+	IF overdrawn = TRUE THEN 
+		RAISE insufficient_funds;
+	END IF;
+	
+	Instead, write:
+	
+	IF overdrawn THEN 
+		RAISE insufficient_funds;
+	END IF;
+	
+	**************************************************************
+	
+	Example 4-1 IF THEN Statement 
+	In this example, the statements between THEN and END IF run if and only if the value of sales
+	is greater than quota+200.
+	
+	DECLARE 
+		PROCEDURE p (
+			sales 	NUMBER,
+			quota	NUMBER,
+			emp_id	NUMBER 
+		)
+		IS 
+			bonus 	NUMBER :=0;
+			updated 	VARCHAR2(3) := 'No';
+		BEGIN 
+			IF sales > (quota + 200) THEN 
+				bonus := (sales - quota)/4;
+				
+				UPDATE employees 
+				SET salary = salary + bonus 
+				WHERE employee_id = emp_id;
+				
+				updated := 'Yes';
+			END IF; 
+			
+			DBMS_OUTPUT.PUT_LINE(
+			'Table Updated?  '|| updated ||' , '||
+			'bonus = '|| bonus ||'.'
+			);
+		END p;
+	BEGIN 
+		p(10100, 10000, 120);
+		p(10500, 10000, 121);
+	END;
+	/
+
+4.1.2 IF THEN ELSE Statement 
+	The IF THEN ELSE Statement has this structure:
+	IF condition THEN 
+		Statements 
+	ELSE 
+		Statements 
+	END IF;
+	
+	If the value of condition is true, the statements run; otherwise the else_statements run.
+
+	Example 4-2 IF THEN ELSE Statement 
+	
+	DECLARE 
+		PROCEDURE p (
+		sales	NUMBER,
+		quota	NUMBER,
+		emp_id	NUMBER 
+		)
+		IS
+			bonus 	NUMBER := 0;
+		BEGIN 
+			IF sales > (quota + 200) THEN 
+				bonus := (sales - quota)/4;
+			ELSE 
+				bonus := 50;
+			END IF;
+		
+			DBMS_OUTPUT.PUT_LINE('bonus: '|| bonus);
+		
+			UPDATE employees 
+			SET salary = salary + bonus 
+			WHERE employee_id = emp_id;
+		END p;
+	BEGIN 
+		p(10100, 10000, 120);
+		p(10500, 10000, 121);
+	END;
+	/
+	
+	Example 4-3 Nested IF THEN ELSE Statements 
+	
+	DECLARE 
+		PROCEDURE p (
+			sales 	NUMBER,
+			quota	NUMBER,
+			emp_id	NUMBER 
+		) 
+		IS 
+			bonus 	NUMBER := 0;
+		BEGIN 
+			IF sales > (quota + 200) THEN 
+				bonus := (sales - quota)/4;
+			ELSE 
+				IF sales > quota THEN 
+					bonus := 50;
+				ELSE 
+					bonus := 0;
+				END IF; 
+			END IF;
+			
+			DBMS_OUTPUT.PUT_LINE('bonus = '|| bonus );
+			
+			UPDATE employees 
+			SET salary = salary + bonus 
+			WHERE employee_id = emp_id;
+		END p;
+	BEGIN 
+		p(10100, 10000, 120);
+		p(10500, 10000, 121);
+		p(9500, 10000, 122);
+	END;
+	/
+	
+4.1.3 IF THEN ELSIF Statement 
+	The IF THEN ELSIF statement has this structure.
+	
+	IF condition_1 THEN 
+		Statement_1 
+	ELSIF condition_2 THEN 
+		Statement_2 
+	[ ELSIF condition_3 THEN 
+		Statement_3
+	] ...
+	[ ELSE
+		else_statement 
+	]
+	END IF;
+	
+	The IF THEN ELSIF statement runs the first statements for which condition is true.
+	Remaining conditions are not evaluated. If no condition is true, the else_statements run, if
+	they exist; otherwise, the IF THEN ELSIF statement does nothing.
+	
+	Example 4-4 
+	
+	DECLARE 
+		PROCEDURE p (sales NUMBER)
+		IS 
+			bonus	NUMBER :=0;
+		BEGIN 
+			IF sales > 50000 THEN 
+				bonus := 1500;
+			ELSIF sales > 35000 THEN 
+				bonus := 500 
+			ELSE 
+				bonus := 100;
+			END IF;
+			
+			DBMS_OUTPUT.PUT_LINE(
+			'Sales = '|| sales || ', bonus = '|| bonus ||'.'
+			);
+		END p;
+	BEGIN 
+		p(55000);
+		p(40000);
+		p(30000);
+	END;
+	/
+	
+	Example 4-5 IF THEN ELSIF Statement simulates Simple CASE Statement 
+	
+	DECALRE 
+		grade CHAR(1);
+	BEGIN 
+		IF grade = 'A' THEN 
+			DBMS_OUTPUT.PUT_LINE('Excellent');
+		ELSIF grade = 'B' THEN 
+			DBMS_OUTPUT.PUT_LINE('Very Good');
+		ELSIF grade = 'C' THEN 
+			DBMS_OUTPUT.PUT_LINE('Good');
+		ELSIF grade = 'D' THEN 
+			DBMS_OUTPUT.PUT_LINE('Fair');
+		ELSIF grade = 'F' THEN 
+			DBMS_OUTPUT.PUT_LINE('Poor');
+		ELSE 
+			DBMS_OUTPUT.PUT_LINE('No such grade');
+		END IF;
+	END;
+	/
+	
+	
+4.1.4 Simple CASE Statement 
+	The Simple CASE Statement has this structure 
+	
+	CASE selector 
+		WHEN selector_value_1 THEN statement_1 
+		WHEN selector_value_2 THEN statement_2 
+		...
+		WHEN selector_value_n THEN statement_n 
+		[ ELSE 
+			else_statement ]
+		END CASE;
+		
+	The selector is an expression. Each selector_value can be either a literal or an expression.
+	
+	Example 4-6 Simple CASE Statement 
+	DECLARE 
+		grade CHAR(1);
+	BEGIN 
+		grade = 'B';
+		
+		CASE grade 
+			WHEN 'A' THEN DBMS_OUTPUT.PUT_LINE('Excellent');
+			WHEN 'B' THEN DBMS_OUTPUT.PUT_LINE('Very Good');
+			WHEN 'C' THEN DBMS_OUTPUT.PUT_LINE('Good');
+			WHEN 'D' THEN DBMS_OUTPUT.PUT_LINE('Fair');
+			WHEN 'F' THEN DBMS_OUTPUT.PUT_LINE('Poor');
+			ELSE DBMS_OUTPUT.PUT_LINE('No such grade');
+		END CASE;
+	END;
+	/
+	
+	
+4.1.5  Search CASE Statement 
+	The searched CASE statement has this structure 
+	
+	CASE 
+	WHEN condition_1 THEN Statement_1 
+	WHEN condition_2 THEN statement_2 
+	...
+	WHEN condition_n THEN statemnet_n 
+	[ ELSE 
+		else_statement ]
+	END CASE;
+	
+	Example 4-7 Searched CASE Statement 
+	DECLARE 
+		grade CHAR(1);
+	BEGIN 
+		grade := 'B';
+		
+		CASE
+			WHEN grade = 'A' THEN DBMS_OUTPUT.PUT_LINE('Excellent');
+			WHEN grade = 'B' THEN DBMS_OUTPUT.PUT_LINE('Very Good');
+			WHEN grade = 'C' THEN DBMS_OUTPUT.PUT_LINE('Good');
+			WHEN grade = 'D' THEN DBMS_OUTPUT.PUT_LINE('Fair');
+			WHEN grade = 'F' THEN DBMS_OUTPUT.PUT_LINE('Poor');
+			ELSE  DBMS_OUTPUT.PUT_LINE('No such grade');
+		END CASE;
+	END;
+	/
+	
+	
+	Example 4-8 EXCEPTION instead of ELSE Clause in CASE Statement 
+	
+	DECLARE 
+		grade CHAR(1);
+	BEGIN
+		grade := 'B' 
+		
+		CASE 
+			WHEN grade = 'A' THEN DBMS_OUTPUT.PUT_LINE('Excellent');
+			WHEN grade = 'B' THEN DBMS_OUTPUT.PUT_LINE('Very Good');
+			WHEN grade = 'C' THEN DBMS_OUTPUT.PUT_LINE('Good');
+			WHEN grade = 'D' THEN DBMS_OUTPUT.PUT_LINE('Fair');
+			WHEN grade = 'F' THEN DBMS_OUTPUT.PUT_LINE('Poor');
+		END CASE;
+
+		EXCEPTION 
+			WHEN CASE_NOT_FOUND THEN 
+				DBMS_OUTPUT.PUT_LINE('No Such Grade');
+	END;
+	/
+	
+	
+4.2 LOOP Statements 
+
+	Loop Statements run the same statements with a series of different values. 
+	The loop statements are:
+	. BASIC LOOP 
+	. FOR LOOP 
+	. CURSOR FOR LOOP 
+	. WHILE LOOP 
+	
+	The statements that exit a loop are:
+	. EXIT 
+	. EXIT WHEN 
+	
+	The statements that exit the current iteration of a loop are:
+	. CONTINUE 
+	. CONTINUE WHEN 
+	
+	EXIT, EXIT WHEN, CONTINUE, CONTINUE WHEN and can appear anywhere inside a loop, but 
+	not outside a loop. Oracle recommends using these statements intead of the 'GOTO statememt',
+	which can exit a loop or the current iteration of a loop by transferring control to a  
+	statement outside the loop. (A raised exception also exits a loop).
+	
+	LOOP statements can be labeled, and LOOP statement can be nested. Labels are 
+	recommended for nested loops to improve redability. We must ensure that the leabel in the END LOOP
+	statement matched the label at the beginning of the same loop statement (The 
+	compiler does not check).
+	
+4.2.1 Basic LOOP Statement 
+	The basic LOOP statement has this structure 
+	
+	[label] LOOP 
+		statements 
+	END LOOP [label];
+	
+	With each iteration of the loop, the statements run and control returns to the top of the 
+	loop. To prevent an infinity loop, a statement or raised exception must exit the loop.
+
+4.2.2 EXIT Statement 
+	The EXIT statement exits the current iteration of a loop unconditionally and transfers 
+	control to the end of either the current loop or an enclosing labeled loop.
+	
+	Example 4-9 Basic LOOP Statement with EXIT Statement 
+	DECLARE 
+		x NUMBER :=0;
+	BEGIN 
+		LOOP	
+			DBMS_OUTPUT.PUT_LINE('Inside loop: x = '|| TO_CHAR(x));
+			x := x +1;
+			if x > 3 THEN 
+				EXIT;
+			END IF;
+		END LOOP;
+		
+		-- After Exit, Control resumes here 
+		DBMS_OUTPUT.PUT_LINE('After loop x= '|| TO_CHAR(x));
+	END;
+	/
+	
+	
+4.2.3 EXIT WHEN Statement 
+	The EXIT WHEN statement exits the current iteration of a loop when the cindition in its WHEN 
+	clause is TRUE, and transfers control to the end of either the current loop or an enclosing
+	labeled loop.
+	
+	Example 4-10 Basic LOOP Statement with EXIT WHEN Statement 
+	
+	DECLARE	
+		x	NUMBER :=0;
+	BEGIN 
+		LOOP	
+			DBMS_OUTPUT.PUT_LINE('Inside loop: x = '|| TO_CHAR(x));
+			x := x +1; -- Prevents infinite loop 
+			EXIT WHEN x > 3;
+		END LOOP;
+		-- After EXIT statement, control resumes here 
+		DBMS_OUTPUT.PUT_LINE('After loop: x = '|| TO_CHAR(x));
+	END;
+	/
+	
+	Example 4-11 Nested, Labeled Basic LOOP Statement with EXIT WHEN 
+	DECLARE 
+		s	PLS_INTEGER := 0;
+		i 	PLS_INTEGER := 0;
+		j 	PLS_INTEGER := 0;
+	BEGIN 
+		<<outer_loop>>
+		LOOP
+			i := j +1;
+			j := 0;
+			<<inner_loop>>
+			LOOP
+				j := j +1;
+				s := s +i * j; -- Sum several products 
+				EXIT inner_loop WHEN (j > 5);
+				EXIT outer_loop WHEN ((i * j) > 15);
+			END LOOP inner_loop;
+		END LOOP outer_loop;
+		DBMS_OUTPUT.PUT_LINE(
+		'The sum of products equals: ' || TO_CHAR(s)
+		);
+	END;
+	/
+	
+	Example 4-12, the outer loop is not labeled; therefore the inner loop connot transfer control to it.
+	Example 4-12 Nested, Unabeled Basic LOOP Statements with EXIT WHEN Statements 
+	
+	DECLARE 
+		i 	PLS_INTEGER := 0;
+		j 	PLS_INTEGER := 0;
+	BEGIN 
+		LOOP
+			i := i + 1;
+			DBMS_OUTPUT.PUT_LINE('i = '|| i);
+		
+			LOOP 
+				j := j + 1;
+				DBMS_OUTPUT.PUT_LINE('j = '|| j);
+				EXIT WHEN (j > 3);
+			END LOOP;
+		
+			DBMS_OUTPUT.PUT_LINE('Exited inner loop')
+			EXIT WHEN (i > 2);
+		END LOOP;
+		
+		DBMS_OUTPUT.PUT_LINE('Exited outer loop');
+	END;
+	/
+	
+4.2.4 CONTINUE Statement 
+	The CONTINUE statement exits the current iteration of a loop unconditionally and transfers 
+	control to the next iteration of either the current loop or an enclosing labeled loop.
+	
+	Example 4-13 CONTINUE Statement in Basic LOOP Statement 
+	
+	DECLARE 
+		x NUMBER := 0;
+	BEGIN 
+		LOOP  -- after CONTINUE statement, control resumes here 
+			DBMS_OUTPUT.PUT_LINE('Inside loop: x = '|| TO_CHAR(x));
+			
+			x := x + 1;
+			IF x < 3 THEN 
+				CONTINUE;
+			END IF;
+			
+			DBMS_OUTPUT.PUT_LINE
+			(' Inside loop, after CONTINUE: x = || TO_CHAR(x));
+			
+			EXIT WHEN x = 5;
+		END LOOP;
+		
+		DBMS_OUTPUT.PUT_LINE('After loop: x = '|| TO_CHAR(x));
+	END;
+	/
+	
+4.2.5 CONTINUE WHEN Statement 
+	The CONTINUE WHEN statement exits the current iteration of a loop when the condition in 
+	its WHEN clause is true, and tranfers control to the next iteration of either the current 
+	loop or an enclosing labeled loop.
+	
+	
+	Example 4-14 CONTINUE WHEN Statement in Basic LOOP Statement 
+	
+	DECALRE 
+		x	NUMBER :=0;
+	BEGIN 
+		LOOP  	-- After CONTINUE statement, control resumes here 
+			DBMS_OUTPUT.PUT_LINE('Inside loop: x = '|| TO_CHAR(x));
+			x := x +1;
+			CONTINUE WHEN x < 3;
+			DBMS_OUTPUT.PUT_LINE
+			('Inside loop, after CONTINUE: x = '|| TO_CHAR(x));
+			EXIT WHEN x = 5;
+		END LOOP;
+		DBMS_OUTPUT.PUT_LINE('After loop: x = '|| TO_CHAR(x));
+	END;
+	/
+
+4.2.6 FOR LOOP Statement
+	The FOR LOOP Statement runs one or more statements while the loop index is in a specified 
+	range. The statement has this structure 
+	
+	[ label ] FOR index IN [REVERSE] lower_bound..upper_bound LOOP 
+		statements 
+	END LOOP [ label ];
+
+	Without REVERSE, the value of index start at lower_bound and increase by one with each 
+	iteration of the loop unit it reaches upper_bound. If lower_bound is greater than upper_bound,
+	then the statement never run.
+	
+	With REVERSE, the value of index starts at upper_bound and decrease by one with each iteration 
+	of the loop until it reaches lower_bound. 
+	
+	An EXIT, EXIT WHEN, CONTINUE or CONTINUE WHEN in the statements can cause the loop or the 
+	current iteration of the loop to end early.
+	
+	Example 4-15 FOR LOOP Statements 
+	BEGIN 
+		DBMS_OUTPUT.PUT_LINE('lower_bound < upper_bound');
+		
+		FOR i IN 1..3 LOOP
+			DBMS_OUTPUT.PUT_LINE(i);
+		END LOOP;
+		
+		DBMS_OUTPUT.PUT_LINE('lower_bouns = upper_bound');
+		
+		FOR i JN 2..2 LOOP
+			DBMS_OUTPUT.PUT_LINE(i)
+		END LOOP;
+		
+		DBMS_OUTPUT.PUT_LINE('lower_bound > upper_bound'):
+		
+		FOR i IN 3..1 LOOP 
+			DBMS_OUTPUT.PUT_LINE(i);
+		END LOOP;
+	END;
+	/
+	
+	Example 4-16 Reverse FOR LOOP Statements 
+	
+	BEGIN 
+		DBMS_OUTPUT.PUT_LINE('upper_bound' > lower_bound);
+		
+		FOR i IN REVERSE 1..3 LOOP 
+			DBMS_OUTPUT.PUT_LINE(i);
+		END LOOP;
+		
+		DBMS_OUTPUT.PUT_LINE('upper_bound = lower_bound');
+		
+		FOR i IN REVERSE 2..2 LOOP 
+			DBMS_OUTPUT.PUT_LINE(i);
+		END LOOP;
+		
+		DBMS_OUTPUT.PUT_LINE('upper_bound < lower_bound');
+		
+		FOR i IN REVERSE 3..1 LOOP 
+			DBMS_OUTPUT.PUT_LINE(i);
+		END LOOP;
+		
+	END;
+	/
+	
+	
+	Example 4-17 Simulating STEP Clause in FOR LOOP Statement 
+	
+	DECLARE 
+		step PLS_INTEGER := 5;
+	BEGIN 
+		FOR i IN 1..3 LOOP 
+			DBMS_OUTPUT.PUT_LINE(i*step);
+		END LOOP;
+	END;
+	/
+	
+	
+4.2.6.1 FOR LOOP Index 
+	The index of a FOR LOOP statement is simplicity declared as a variable of type PLS_INTEGER
+	that is local to the loop. The statements in the loop can read the value if the index, but
+	can not change it. Statements outside the loop can not reference the index. After the FOR LOOP 
+	statement runs, the index is undefined. 
+	
+	Example 4-18 FOR LOOP Statement tries to change Index Value 
+	
+	BEGIN 
+		FOR i IN 1..3 LOOP 
+			IF i < 3 THEN 
+				DBMS_OUTPUT.PUT_LINE(TO_CHAR(i));
+			ELSE 
+				i := 2;
+			END IF;
+		END LOOP;
+	END;
+	/
+	
+	Example 4-19 Outside Statement References FOR LOOP statement index 
+	
+	BEGIN 
+		FOR i IN 1..3 LOOP 
+			DBMS_OUTPUT.PUT_LINE('Inside loop, i is '||TO_CHAR(i));
+		END LOOP;
+		
+		DBMS_OUTPUT.PUT_LINE('Outside loop, i is '|| TO_CHAR(i)); -- Error 
+	END;
+	/
+	
+	
+	Example 4-20 FOR LOOP Statement Index with Same Name as Variable 
+	
+	DECLARE 
+		i NUMBER := 5;
+	BEGIN 
+		FOR i IN 1..3 LOOP 
+			DBMS_OUTPUT.PUT_LINE('Inside loop, i is '|| TO_CHAR(i));
+		END LOOP; 
+		
+		DBMS_OUTPUT.PUT_LINE('Outside loop, i is '|| TO_CHAR(i));
+	END;
+	/
+	
+	Example 4-21 FOR LOOP Statememnt References Variable with Same name as Index 
+	
+	<<main>> 	-- Label Block 
+	DECALRE 
+		i NUMBER := 5;
+	BEGIN 
+		FOR i IN 1..3 LOOP 
+			DBMS_OUTPUT.PUT_LINE(
+			'local: '|| TO_CHAR(i) || ', global: '||
+			TO_CHAR(main.i) 		-- Qualify reference with block label.
+			);
+		END LOOP;
+	END main;
+	/
+	
+	Example 4-22 Nested FOR LOOP Statements with Same Index Name 
+	
+	BEGIN 
+		<<outer_loop>>
+		FOR i IN 1..5 LOOP	
+			<<inner_loop>>
+			FOR i IN 1..3 LOOP 
+				IF outer_loop.i = 2 THEN 
+					DBMS_OUTPUT.PUT_LINE
+					('Outer: '|| TO_CHAR(outer_loop.i) || ' Inner: '
+					|| TO_CHAR(inner_loop.i));
+				END IF;
+			END LOOP inner_loop;
+		END LOOP outer_loop;
+	END;
+	/
+	
+	
+4.2.6.2 Lower Bound and Upper Bound 
+	The lower and upper bound of a FOR LOOP statement can be either numeric literals, numeric variables, or numeric expressions. 
+	If a bound does not have a numeric value the PL/SQL raise the predefined exception VALUE_ERROR.
+	
+	Example 4-23 FOR LOOP Statement Bounds 
+	DECLARE 
+		first	INTEGER := 1;
+		last	INTEGER := 10;
+		high	INTEGER := 100;
+		low		INTEGER := 12;
+	BEGIN 
+		-- Bounds are numeric literals:
+		FOR j IN -5..5 LOOP 
+			NULL;
+		END LOOP;
+		
+		-- Bounds are numeric variable 
+		FOR k IN REVERSE first..last LOOP 
+			NULL;
+		END LOOP;
+	END;
+	/
+	
+	Example 4-24 Specifiying fOR LOOP Statement Bounds at Run Time 
+	
+	DROP TABLE temp;
+	CREATE TABLE temp(
+		empno	NUMBER,
+		email_add	VARCHAR2(50)
+		);
+		
+	DECLARE 
+		emp_count	NUMBER;
+	BEGIN 
+		SELECT COUNT(employee_id) INTO emp_count 
+		FROM employees;
+		
+		FOR i IN 1..emp_count LOOP 
+			INSERT INTO temp (emp_no, email_add)
+			VALUES (i, 'to be added later');
+		END LOOP;
+	END;
+	/
+	
+4.2.6.3 WHEN or CONTINUE WHEN Statement in FOR LOOP Statement 
+	Suppose that we must exit a FOR LOOP statement immediately ia a certion condition arises.
+	we can put the condition in an EXIT WHEN statement inside the FOr LOOP statement.
+	
+	Example 4-25 EXIT WHEN Statement in FOR LOOP Statement 
+	
+	DECLARE 
+		v_employees employees%ROWTYPE;
+		CURSOR c1 IS SELECT * FROM employees;
+	BEGIN 
+		OPEN c1;
+		-- Fetch entire row into v_employees record 
+		FOR i IN 1..10 LOOP	
+			FETCH c1 INTO v_employees;
+			EXIT WHEN c1%NOTFOUND;
+			-- Process data here 
+		END LOOP;
+		CLOSE c1;
+	END;
+	/
+	
+	Example 4-26 EXIT WHEN Statement in Inner FOR LOOP Statement 
+	
+	DECLARE 
+		v_employees 	employees%ROWTYPE;
+		CURSOR c1 IS SELECT * FROM employees;
+	BEGIN 
+		OPEN c1;
+		
+		-- Fetch entire rwo into v_employees record 
+		<<outer_loop>>
+		FOR i IN 1..10 LOOP 
+			-- Process Data here 
+			FOR j IN 1..10 LOOP	
+				FETCH c1 INTO v_employees;
+				EXIT outer_loop WHEN c1%NOTFOUND;
+				--Process Data Here 
+			END LOOP;
+		END LOOP outer_loop;
+		
+		CLOSE c1;
+	END;
+	/
+	
+	
+	DECLARE 
+		v_dept    dept%ROWTYPE;
+		CURSOR c1 IS SELECT
+		"A1"."DEPTNO" "DEPTNO",
+		"A1"."DNAME"  "DNAME",
+		"A1"."LOC"    "LOC"
+	FROM
+		"SCOTT"."DEPT" "A1";
+	BEGIN 
+		OPEN c1;
+		<<outer_loop>>
+		FOR i IN 1..5 LOOP
+			DBMS_OUTPUT.PUT_LINE('outer_loop: '|| TO_CHAR(i));
+			FOR j IN 1..5 LOOP
+				FETCH c1 INTO v_dept;
+				
+				EXIT outer_loop WHEN c1%NOTFOUND;
+				DBMS_OUTPUT.PUT_LINE('Deptno: '|| v_dept.deptno ||' Dname: '|| v_dept.dname || ' Location: '|| v_dept.loc);
+				DBMS_OUTPUT.PUT_LINE(j);
+			END LOOP;
+		END LOOP outer_loop;
+	END;
+	/
+	
+	
+	DECLARE 
+		v_dept    dept%ROWTYPE;
+		CURSOR c1 IS SELECT
+		"A1"."DEPTNO" "DEPTNO",
+		"A1"."DNAME"  "DNAME",
+		"A1"."LOC"    "LOC"
+	FROM
+		"SCOTT"."DEPT" "A1";
+	BEGIN 
+		OPEN c1;
+		<<outer_loop>>
+		FOR i IN 1..5 LOOP
+			DBMS_OUTPUT.PUT_LINE('outer_loop: '|| TO_CHAR(i));
+			FOR j IN 1..5 LOOP
+				FETCH c1 INTO v_dept;
+				
+				CONTINUE outer_loop WHEN c1%NOTFOUND;
+				DBMS_OUTPUT.PUT_LINE('Deptno: '|| v_dept.deptno ||' Dname: '|| v_dept.dname || ' Location: '|| v_dept.loc);
+				DBMS_OUTPUT.PUT_LINE(j);
+			END LOOP;
+		END LOOP outer_loop;
+	END;
+	/
+	
+	
+		
+	Example 4-27 CONTINUE WHEN statement in inner FOR LOOP statement 
+	
+	DECLARE 
+		v_employees employees%ROWTYPE;
+		CURSOR c1 IS SELECT * FROM employees;
+	BEGIN 
+		OPEN c1;
+		
+		-- Fetch entire row into v_employees record:
+		<<outer_loop>>
+		FOR i IN 1..10 LOOP 
+			-- Process the data here 
+			FOR j IN 1..10 LOOP 
+				FETCH c1 INTO v_employees;
+				CONTINUE outer_loop WHEN c1%NOTFOUND;
+				-- Process data here 
+			END LOOP;
+		END LOOP outer_loop;
+	END;
+	/
+	
+	
+4.2.7 WHILE LOOP Statement 
+	The WHILE LOOP statement runs one or more statements while a condition is true.
+	It has this structure 
+		[ label ] WHILE condition LOOP 
+			statements 
+		END LOOP [ label ];
+	If the condition is true, the statements run and control returns to the rop if the loop,
+	where condition is evaluated again. If the condition is not true, control transfers to 
+	the statement after the WHILE LOOP statement. To prevent an infinity loop, a statement 
+	inside the loop must make the condition false or null.
+	
+	Example 4-28 WHILE LOOP Statements 
+	
+	DECLARE 
+		done 	BOOLEAN := FALSE;
+	BEGIN 
+		WHILE done LOOP 
+			DBMS_OUTPUT.PUT_LINE('This line does not print.');
+			done := TRUE; 	-- This assignment is not made.
+		END LOOP;
+		
+		WHILE NOT done LOOP	
+			DBMS_OUTPUT.PUT_LINE('Hellow world!');
+			done := TRUE;
+		END LOOP;
+	END;
+	/
+	
+4.3 Sequentioanl Control Statements 
+	Unlike the IF and LOOP statements, the sequentioanl control statement GOTO and NULL 
+	are not crucial to PL/SQL programming.
+	
+4.3.1 GOTO Statement 
+	The GOTO statement transfer control to a label unconditionally. The label must be unique in 
+	its scope and must preced an executable statement or a PL/SQL block. 
+	
+	Example 4-29 GOTO Statement 
+	DECLARE 
+		p 	VARCHAR2(30);
+		n 	PLS_INTEGER:= 37;
+	BEGIN 
+		FOR j IN 2..ROUND(SQRT(n)) LOOP 
+			IF n MOD j = 0 THEN 
+				p := 'is not a prime number';
+				GOTO print_now;
+			END IF;
+		END LOOP;
+		
+		p := 'is a prime number';
+		
+		<<print_now>> 
+		DBMS_OUTPUT.PUT_LINE(TO_CHAR(n) || p);
+	END;
+	/
+	
+	
+	Example 4-30 Incorrect Label Placement 
+	
+	DECLARE 
+		done BOOLEAN;
+	BEGIN	
+		FOR i IN 1..50 LOOP 
+			IF done THEN 
+				GOTO end_loop;
+			END IF;
+			<<end_loop>>
+		END LOOP;
+	END;
+	/
+	
+	
+	Example 4-31 GOTO Statement Goes to Labeled NULL Statement 
+	
+	DECLARE 
+		done BOOLEAN;
+	BEGIN 
+		FOR i IN 1..50 LOOP 
+			IF done THEN 
+				GOTO end_loop;
+			ENF IF;
+			<<end_loop>>
+			NULL;
+		END LOOP;
+	END;
+	/
+	
+	Example 4-32 GOTO statement Transfers control to enclosing block 
+	
+	DECLARE 
+		v_last_name		VARCHAR2(25);
+		v_emp_id		NUMBER(6) := 120;
+	BEGIN 
+		<<get_name>> 
+		SELECT last_name INTO v_last_name 
+		FROM employees 
+		WHERE employee_id = v_emp_id;
+		
+		BEGIN 
+			DBMS_OUTPUT.PUT_LINE('v_last_name');
+			v_emp_id := v_emp_id +5;
+			
+			IF v_emp_id < 120 THEN 
+				GOTO get_name;
+			END IF:
+		END;
+	END;
+	/
+	
+	
+	Example 4-33 GOTO Statement cannot transfer control into IF Statement 
+	
+	DECLARE 
+		valid 	BOOLEAN := TRUE;
+	BEGIN 
+		GOTO update_row:
+		
+		IF valid THEN 
+			<<update_row>>
+			NULL;
+		END IF;
+	END;
+	/
+	
+4.3.2 NULL Statement 
+	The NULL statement only passes control to the next statement. Some languages refer to such 
+	an instruction as a no-op (no operation)
+	
+	Example 4-34 NULL Statement Showing No Action 
+	
+	DECLARE 
+		v_job_id	VARCHAR2(10);
+		v_emp_id	NUMBER(6) := 110;
+	BEGIN 
+		SELECT job_id INTO v_job_id 
+		FROM employees 
+		WHERE employee_id = v_emp_id;
+		
+		IF v_job_id = 'SA_REP' THEN 
+			UPDATE employees 
+			SET commission_pct = commission_pct * 1.2;
+		ELSE 
+			NULL; 	-- Employee is not a sales rep 
+		END IF;
+	END;
+	/
+	
+	Example 4-35 NULL Statement as Placeholder during subprogram creation 
+	
+	CREATE OR REPLACE PROCEDURE award_bonus (
+		emp_id	NUMBER,
+		bonus	NUMBER 
+		) AITHID DEFINER AS 
+	BEGIN 	-- Executable part starts here 
+		NULL; 	-- Placeholder 
+		-- (raise "unreachable code" if warning enabled)
+	END award_bonus;
+	/
+	
+	Example 4-36 NULL Statement in ELSE clause of Simple CASE Statement 
+	
+	CREATE OR REPLACE PROCEDURE print_grade (
+		grade 	CHAR
+	) AUTHID DEFINER AS 
+	BEGIN 
+		CASE grade 
+			WHEN 'A' THEN DBMS_OUTPUT.PUT_LINE('Excellent');
+			WHEN 'B' THEN DBMS_OUTPUT.PUT_LINE('Very Good');
+			WHEN 'C' THEN DBMS_OUTPUT.PUT_LINE('Good');
+			WHEN 'D' THEN DBMS_OUTPUT.PUT_LINE('Fair');
+			WHEN 'F' THEN DBMS_OUTPUT.PUT_LINE('Poor');
+			ELSE NULL;
+		END CASE;
+	END;
+	/
+	
+	BEGIN 
+		print_grade('A');
+		print_grade('S');
+	END;
+	/
+	
+	
+		
+	
+			
+		
+	
+	
+		
+	
+		
+	
+	
+	
+	
+	
+		
+	
+		
+			
+	
+			
+		
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+
+	
+	
+	

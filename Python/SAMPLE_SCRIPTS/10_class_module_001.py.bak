@@ -1,0 +1,34 @@
+# module / function / package 
+
+# function :
+# block of executable code with business logic 
+
+# module:
+# module contain number of similar or related functions 
+
+
+# calculator 
+# math 
+def add(*args):
+	sum_ = 0
+	for i in  args:
+		 sum_ = sum_ +  i
+	return i
+
+def sub(*args):
+	sub_=args[0]
+	for i in range(1, len(args)):
+		sub_ -=args[i]
+
+	return sub_
+
+def mul(*args):
+	mul_=args[0]
+	for i in range(1, len(args)):
+		mul_ -=args[i]
+	return mul_
+
+
+if __name__ == '__main__':
+	result = add(5, 4)
+	print(result)

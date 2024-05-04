@@ -1,0 +1,193 @@
+add = {
+    'street': 'Bapuji Nagar',
+    'city': 'Bhubaneswar',
+    'dist': 'Khorda',
+    'state': 'Odisha',
+    'country': 'India',
+    'pin': 750001}
+
+
+#print(add[0]) # KeyError: 'pinn' Dictionary does not eccept index, it works on Key-Value Pairs
+"""
+print(add['street'])
+print(add['city'])
+print(add['dist'])
+print(add['state'])
+print(add['country'])
+print(add['pin'])
+
+# print(add['pinn']) # KeyError: 'pinn'
+
+# Dictionary is an iterable item in Python
+# so we can use this loop to get the values
+
+for i in add:
+	print(i) # will Print all the Keys 
+	print(add[i], end='\n ')
+
+
+for i in add.keys():
+	print(f'Keys: {i}')
+
+
+for key, val in add.items():
+	print(f"Key: {key} and its values is {val}")
+
+
+# ADD A NEW KEY VALUE TO DICTIONARY:
+add['ccode'] = 'IN' 
+for key, val in add.items():
+	print(f"Key: {key} and its values is {val}")
+
+
+
+# UPDATE A VALUE IN DICTIONARY 
+
+add['pin'] = 755022
+print(add['pin'])
+"""
+
+# DELETE A VALUE FORM DICTIONARY 
+
+add.pop('pin')
+print(add)
+
+del(add['city'])
+print(add)
+
+
+
+# VARIABLE LENGTH KEY-WARD ARGUMENT
+
+# Tuples 
+# Dictionary 
+
+
+import os 
+
+os.system('cls')
+
+
+# KEY:VALUES store data enclosed by curlybrackets 
+
+# dic = {key:value, key:value}
+
+
+addr ={
+	'street': 'Bapuji Nagar',
+	'city': 'Bhubaneswar', 
+	'dist': 'Khorda',
+	'state': 'Odisha',
+	'country': 'India',
+	'pin': 750001} 
+
+
+"""
+print(addr['street']) # KeyError: 1
+print(addr['city'])
+print(addr['dist'])
+print(addr['state'])
+print(addr['country'])
+print(addr['pinn']) # KeyError: 'pinn'
+
+"""
+# Update existing value in a Dictionary
+addr['pin'] = 750002  # It will update the value for the key
+#print(addr['pin'])
+
+addr['piin'] = 750023  # It will add a new key-value to the dictionary as the key is not exists in the dictionary 
+
+#print(addr)
+
+
+
+
+d = {'name': None}
+#print(d)
+
+
+# To remove a key-value from a dictionary 
+# pop() 
+# del()
+
+
+addr.pop('piin')
+#print(addr)
+
+
+#del(addr['pin'])
+#print(addr)
+
+
+# Iterable Iterms 
+# String 
+# Tuple 
+# List 
+# Dictionary 
+# Set 
+
+
+# Iterate a Dictioary 
+
+# keys()
+key = addr.keys()
+print(key)
+
+# values() 
+
+val = addr.values()
+print(val)
+
+# items()
+k = list(addr.items())
+
+print(f"K: {k}")
+print(f"Keys: {k[0][0]}")
+print(f"Values: {k[0][1]}")
+#print(f"Values: {v}")
+
+
+print(f"Key: {k[5][0]}")
+print(f"Value: {k[5][1]}") 
+
+
+
+"""
+ [
+ ('street', 'Bapuji Nagar'), # 0[0] / 0[1]
+ ('city', 'Bhubaneswar'),	 # 1[0] / 1[1]
+ ('dist', 'Khorda'),		 # 2
+ ('state', 'Odisha'),		 # 3
+ ('country', 'India'),		 # 4
+ ('pin', 750002)			 # 5[0] / 5[1]
+ ]
+
+
+ l = [1, 2, 3, (4, 5), (5, 6), (6, 7)]
+ l[3][1] # (4, 5)
+
+"""
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

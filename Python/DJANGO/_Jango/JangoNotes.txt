@@ -1,0 +1,174 @@
+Jango Notes:
+
+TO Create a Virtual Envirnment 
+
+C:\Users\sayed>pip install pipenv
+
+Create a Folder and go that folder and run the bellow code
+
+D:\RoadMap\Jango_Flask\_Jango>pipenv install django
+Creating a virtualenv for this project...
+Pipfile: D:\RoadMap\Jango_Flask\_Jango\Pipfile
+Using default python from c:\users\sayed\appdata\local\programs\python\python38-32\python.exe (3.8.5) to create virtualenv...
+[====] Creating virtual environment...created virtual environment CPython3.8.5.final.0-32 in 1721ms
+  creator CPython3Windows(dest=C:\Users\sayed\.virtualenvs\_Jango-W-QE1le3, clear=False, no_vcs_ignore=False, global=False)
+  seeder FromAppData(download=False, pip=bundle, setuptools=bundle, wheel=bundle, via=copy, app_data_dir=C:\Users\sayed\AppData\Local\pypa\virtualenv)
+    added seed packages: pip==23.3.1, setuptools==68.2.2, wheel==0.41.2
+  activators BashActivator,BatchActivator,FishActivator,NushellActivator,PowerShellActivator,PythonActivator
+
+Successfully created virtual environment!
+Virtualenv location: C:\Users\sayed\.virtualenvs\_Jango-W-QE1le3
+Creating a Pipfile for this project...
+Installing django...
+Resolving django...
+Added django to Pipfile's [packages] ...
+Installation Succeeded
+Pipfile.lock not found, creating...
+Locking [packages] dependencies...
+Building requirements...
+Resolving dependencies...
+Success!
+Locking [dev-packages] dependencies...
+Updated Pipfile.lock (99c4b9ec1b8891ff787677276760beb6d6d4919c55660da1c713682156a6086c)!
+Installing dependencies from Pipfile.lock (a6086c)...
+To activate this project's virtualenv, run pipenv shell.
+Alternatively, run a command inside the virtualenv with pipenv run.
+
+D:\RoadMap\Jango_Flask\_Jango>dir
+ Volume in drive D is Data
+ Volume Serial Number is 7A97-36FA
+
+ Directory of D:\RoadMap\Jango_Flask\_Jango
+
+06-11-2023  14:18    <DIR>          .
+06-11-2023  14:06    <DIR>          ..
+06-11-2023  14:16                84 JangoNotes.txt
+06-11-2023  14:18               151 Pipfile
+06-11-2023  14:18             3,790 Pipfile.lock
+06-11-2023  14:06    <DIR>          Project1
+               3 File(s)          4,025 bytes
+               3 Dir(s)  22,147,039,232 bytes free
+
+D:\RoadMap\Jango_Flask\_Jango>pipenv shell
+Launching subshell in virtual environment...
+Microsoft Windows [Version 10.0.22621.2428]
+(c) Microsoft Corporation. All rights reserved.
+
+(_Jango-W-QE1le3) D:\RoadMap\Jango_Flask\_Jango>
+
+
+(_Jango-W-QE1le3) D:\RoadMap\Jango_Flask\_Jango>django-admin
+
+Type 'django-admin help <subcommand>' for help on a specific subcommand.
+
+Available subcommands:
+
+[django]
+    check
+    compilemessages
+    createcachetable
+    dbshell
+    diffsettings
+    dumpdata
+    flush
+    inspectdb
+    loaddata
+    makemessages
+    makemigrations
+    migrate
+    optimizemigration
+    runserver
+    sendtestemail
+    shell
+    showmigrations
+    sqlflush
+    sqlmigrate
+    sqlsequencereset
+    squashmigrations
+    startapp
+    startproject
+    test
+    testserver
+Note that only Django core commands are listed as settings are not properly configured (error: Requested setting INSTALLED_APPS, but settings are not configured. You must either define the environment variable DJANGO_SETTINGS_MODULE or call settings.configure() before accessing settings.).
+
+(_Jango-W-QE1le3) D:\RoadMap\Jango_Flask\_Jango>
+
+
+(_Jango-W-QE1le3) D:\RoadMap\Jango_Flask\_Jango>django-admin startproject project1
+
+CommandError: 'D:\RoadMap\Jango_Flask\_Jango\project1' already exists
+
+(_Jango-W-QE1le3) D:\RoadMap\Jango_Flask\_Jango>django-admin startproject project1
+
+
+(_Jango-W-QE1le3) D:\RoadMap\Jango_Flask\_Jango>
+
+
+(_Jango-W-QE1le3) D:\RoadMap\Jango_Flask\_Jango>cd project1
+
+(_Jango-W-QE1le3) D:\RoadMap\Jango_Flask\_Jango\project1>python manage.py
+
+Type 'manage.py help <subcommand>' for help on a specific subcommand.
+
+Available subcommands:
+
+[auth]
+    changepassword
+    createsuperuser
+
+[contenttypes]
+    remove_stale_contenttypes
+
+[django]
+    check
+    compilemessages
+    createcachetable
+    dbshell
+    diffsettings
+    dumpdata
+    flush
+    inspectdb
+    loaddata
+    makemessages
+    makemigrations
+    migrate
+    optimizemigration
+    sendtestemail
+    shell
+    showmigrations
+    sqlflush
+    sqlmigrate
+    sqlsequencereset
+    squashmigrations
+    startapp
+    startproject
+    test
+    testserver
+
+[sessions]
+    clearsessions
+
+[staticfiles]
+    collectstatic
+    findstatic
+    runserver
+
+(_Jango-W-QE1le3) D:\RoadMap\Jango_Flask\_Jango\project1>
+
+(_Jango-W-QE1le3) D:\RoadMap\Jango_Flask\_Jango\project1>python manage.py runserver
+Watching for file changes with StatReloader
+Performing system checks...
+
+System check identified no issues (0 silenced).
+
+You have 18 unapplied migration(s). Your project may not work properly until you apply the migrations for app(s): admin, auth, contenttypes, sessions.
+Run 'python manage.py migrate' to apply them.
+November 06, 2023 - 14:34:10
+Django version 4.2.7, using settings 'project1.settings'
+Starting development server at http://127.0.0.1:8000/
+Quit the server with CTRL-BREAK.
+
+
+# If we get an error for virtual environment while opening the terminal in VSCODE 
+Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy Unrestricted -Force
+Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy Bypass -Force

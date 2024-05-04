@@ -1,0 +1,96 @@
+1. Basic Syntax 
+
+2. Variables 
+
+3. Data Types 
+
+4. Conditional Statements 
+
+5. TypeCasting 
+
+6. Exceptions 
+
+
+7. Functions 
+
+
+8. List 
+
+
+9. Tuple 
+
+
+10. Dictionary 
+
+
+11. Set 
+
+
+12. Linked Lists 
+
+
+13. Stacks 
+
+
+14. Queue 
+
+
+15. Heap 
+
+
+
+16. Hash Table 
+
+
+17. Binary Search Tree
+
+
+18. Recursion 
+
+
+
+19. Shorting Algorithms 
+
+Algorithms     | Time Complexity 
+				 Best	| Average	| Wrost
+1. Quicksort   
+2. Mergesort
+3. Timesort 
+4. Heapsort 
+5. Bublesort
+6. Insertion Sort 
+7. Selection Sort 
+8. Tree Sort 
+9. Shell Sort 
+10. Bucket Sort 
+11. Radix Sort 
+12. Counting Sort 
+13. Cubesort 
+
+ 	
+
+
+20. Modules 
+
+
+21. Calsses 
+
+
+22. OOPS 
+
+
+23. Encapsulation
+
+
+24. Polymorphism
+
+
+25. Inheritance 
+
+
+26. Methods 
+
+
+27. Frameworks 
+
+ 

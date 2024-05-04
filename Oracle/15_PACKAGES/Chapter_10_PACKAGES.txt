@@ -1,0 +1,166 @@
+# PL/SQL Packages
+10.1 What is Package?
+	A Package is a schema object that groups logically related PL/SQL types, variables,
+	contants, subprograms, cursors, and exceptions.
+	A Package is compiled and sroted in the databse, where amny applications can share its contents.
+	A package always has a specification, ehich decalres the public items that can be 
+	referenced from outside the package.
+
+	If the public items include cursors or subprograms, then the package must also have a body.
+	The body must define queries for public cursors and code for public subprograms. The body
+	can also declare and define private items that cannot be referenced from outside the
+	package, but are necessary for the internal workings of the package. 
+	
+	The body can have an initialization part, whose statements initialize variables and do other one-time setup
+	steps, and an exception-handling part. 
+	
+	In either the package specification or package body, you can map a package subprogram to
+	an external Java or C subprogram by using a call specification, which maps the external
+	subprogram name, parameter types, and return type to their SQL counterparts.
+	
+	The ACCESSIBLE BY clause of the package specification lets you specify a white list of
+	PL/SQL units that can access the package.
+	
+10.2 Reasons to Use Packages 
+	Pacjages supposrt the development and maintenance or reliable, reusable code with
+	the following features:
+	. Modularity 
+	. Easier Application Design 
+	. Hidden Implementation Details 
+	. Added Functionality 
+	. Better Performace 
+	. Easier to Grant Roles 
+	
+	
+10.3 Package Specification 
+	A package specification decalres public items. The scope of a public item is the schema
+	of the package. A public item is visible everywhere in the schema.
+	
+	Note: To restrict the use of our package to specified PL/SQL unit, include the 
+	      ACCESSIBLE BY clause in the package specification.
+		  
+	
+10.3.1 Appropriate Public Items:
+	Appropriate public items are:
+	. Types, Variables, Contats, SUbprograms, cursors, and exceptions 
+	  used by multiple subprogram.
+	  
+	
+10.3.2 Creating Package Specifications 
+	To Create a package specification, use the CREATE PACKAGE Statement.
+	
+	Example 10-1 Simple Package Specification 
+	
+	CREATE OR REPLACE PACKAGE trans_data AUTHID DEFINER AS
+		TYPE TimeRec IS RECORD (
+			minutes	SMALLINT,
+			bours	SMALLINT
+		);
+		
+		TYPE TransRec IS RECORD (
+			category	VARCHAR2(10),
+			account		INT,
+			amount		REAL,
+			time_of		TimeRec
+		);
+		
+		minimum_balance		CONSTANT REAL := 10.00;
+		number_processed	INT;
+		insufficient_fund	EXCEPTION;
+		PRAGMA EXCEPTION_INIT(insufficient_fund, -4097);
+	END trans_data;
+	/
+	
+	Example 10-2 Passing Associative Array to Standalone Subprogram 
+	
+	CREATE OR REPLACE PACKAGE aa_pkg AUTHID DEFINER IS 
+		TYPE aa_type IS TABLE OF INTEGER INDEX BY VARCHAR2(15);
+	END;
+	/
+	
+	CREATE OR REPLACE PROCEDURE print_aa (
+		aa aa_pkg.aa_type 
+	) AUTHID DEFINER IS 
+		i VARCHAR2(15);
+	BEGIN 
+		i := aa.FIRST;
+		
+		WHILE i IS NOT NULL LOOP 
+			DBMS_OUTPUT.PUT_LINE(aa(i) || ' ' || i);
+			i := aa.NEXT(i);
+		END LOOP;
+	END;
+	/
+	
+	DECLARE 
+		aa_var aa_pkg.aa_type;
+	BEGIN 
+		aa_var('zero') 	:= 0;
+		aa_var('one') 	:= 1;
+		aa_var('two')	:= 2;
+		
+		print_aa(aa_var);
+	END;
+	/
+	
+	
+10.4 Package Body 
+	If a package specification declares cursor or subprograms, then  a package body is 
+	required; otherwise, it is optional. The package body and package specification must 
+	be in the same schema.
+	
+	Every sursor or subprogram declation in the package specification must have a 
+	corresponding defination in the packgae body. The deadings of corresponding 
+	subprograms declarations and defination must match word for word.
+	
+	Example 10-3 Matching Package Specification and Body 
+		CREATE OR REPLACE PACKAGE emp_bonus AS 
+			PROCEDURE calc_bonus (date_hired	employees.hire_date%TYPE);
+		END emp_bonus;
+		/
+		
+		CREATE OR REPLACE PACKAGE BODY emp_bonus AS 
+			-- DATE does not match employees.hire_date%TYPE 
+			PROCEDURE calc_bonus (date_hired DATE) IS 
+			BEGIN 
+				DBMS_OUTPUT.PUT_LINE
+				('Employees hired on ' || date_hired || ' get bonus.');
+			END;
+		END emp_bonus;
+		/
+		
+		Result: Error 
+		
+		CREATE OR REPLACE PACKAGE BODY emp_bonus AS 			
+			PROCEDURE calc_bonus (date_hired employees.hire_date%TYPE) IS 
+			BEGIN 
+				DBMS_OUTPUT.PUT_LINE
+				('Employees hired on ' || date_hired || ' get bonus.');
+			END;
+		END emp_bonus;
+		/
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	

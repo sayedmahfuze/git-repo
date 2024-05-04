@@ -1,0 +1,1852 @@
+#2.2 Lexical Units:
+The lexical units of PL/SQL are its smallest individual components
+	delimiters, identifiers, literals, pragmas, and comments.
+	
+2.2.1 Delimiters
+	A delimiters is a character, or character combination, that has a special meaning in PL/SQL.
+	Do not embed any other characters (including whitespace characters) inside a delimiter.
+	Table 2-2 PL/SQL Delimiters
+    Delimiter Meaning
+    + Addition operator
+    := Assignment operator
+    => Association operator
+    % Attribute indicator
+    ' Character string delimiter
+    . Component indicator
+    || Concatenation operator
+    / Division operator
+    ** Exponentiation operator
+    ( Expression or list delimiter (begin)
+    ) Expression or list delimiter (end)
+    : Host variable indicator
+    , Item separator
+    << Label delimiter (begin)
+    >> Label delimiter (end)
+    /* Multiline comment delimiter (begin)
+    */ Multiline comment delimiter (end)
+    * Multiplication operator
+    " Quoted identifier delimiter
+    .. Range operator
+    = Relational operator (equal)
+    <> Relational operator (not equal)
+    != Relational operator (not equal)
+    ~= Relational operator (not equal)
+    ^= Relational operator (not equal)
+    < Relational operator (less than)
+    > Relational operator (greater than)
+    <= Relational operator (less than or equal)
+    >= Relational operator (greater than or equal)
+    @ Remote access indicator
+    -- Single-line comment indicator
+    ; Statement terminator
+    - Subtraction or negation operator
+	
+2.2.2 Identifiers 
+	Identifiers name PL/SQL elements, which include:
+	Constants
+	Cursors
+	Exceptions 
+	Keywords
+	Labels
+	Packages
+	Reserved Words
+	Subprograms
+	Types
+	Variables
+	
+	PL/SQL is case-insensitive for identifiers.
+	For example, The identifiers lastname, LastName and LASTNAME are the same.
+	
+	
+2.2.2.2 Predefined Identifiers 
+	Predefined identifiers are declared in the predefined package STANDARD.
+	An example of a predefined identifier is the exception INVALID_NUMBER.
+	For the list of predefined identifiers, connect to Oracle Database as a user who has the DBA role and use this query.
+	SELECT TYPE_NAME FROM ALL_TYPES WHERE PREDEFINED='YES';
+2.2.2.3.1 Ordinary User-Defined Identifiers
+	An ordinary user-defined identifier:
+	• Begins with a letter
+	• Can include letters, digits, and these symbols:
+	– Dollar sign ($)
+	– Number sign (#)
+	– Underscore (_)
+	• Is not a reserved word (listed in Table D-1).
+	The database character set defines which characters are classified as letters and digits. If
+	COMPATIBLE is set to a value of 12.2 or higher, the representation of the identifier in the
+	database character set cannot exceed 128 bytes. If COMPATIBLE is set to a value of 12.1 or
+	lower, the limit is 30 bytes.
+
+
+Example 2-1 Valid Case-Insensitive Reference to Quoted User-Defined Indentifier
+	DECLARE
+		"HELLO" varchar2(10) := 'hello';
+	BEGIN 
+		DBMS_OUTPUT.PUT_LINE(Hello);
+	END;
+	/
+	
+Example 2-2 Invalid Case-Insensitive Reference to Quoted User-Defined Identifier 
+	DECLARE	
+		"HELLO" varchar2(10) := 'hello';
+	BEGIN 
+		DBMS_OUTPUT.PUT_LINE("Hello");
+	END;
+	/
+	
+	ERROR at line 4:
+	ORA-06550: line 4, column 25:
+	PLS-00201: identifier 'Hello' must be declared
+
+Example 2-3 Reserved Word as Quoted User-Defined Identifier 
+	DECLARE
+		"BEGIN" varchar2(15) := 'UPPERCASE';
+		"Begin" varchar2(15) := 'Initial Capital';
+		"begin" varchar2(15) := 'lowercase';
+	BEGIN 
+		DBMS_OUTPUT.PUT_LINE("BEGIN");
+		DBMS_OUTPUT.PUT_LINE("Begin");
+		DBMS_OUTPUT.PUT_LINE("begin");
+	END;
+	/
+	
+Example 2-4 Neglecting Double Quotation Marks 
+	DECLARE
+		"HELLO" varchar2(10) := 'hello'; -- HELLO is not a reserved word 
+		"BEGIN" varchar2(10) := 'begin'; -- BEGIN is a reserved word
+	BEGIN	
+		DBMS_OUTPUT.PUT_LINE(Hello); -- Double quotation marks are optional
+		DBMS_OUTPUT.PUT_LINE(BEGIN); -- Double quotation marks are required
+	END;
+	/
+	
+	
+Example 2-5 Neglecting Case-Sensitivity
+	DECLARE	
+		"HELLO" varchar2(10) := 'hello'; -- HELLO is not a reserved word 
+		"BEGIN" varchar2(10) := 'begin'; -- BEGIN is a reserved word 
+	BEGIN 
+		DBMS_OUTPUT.PUT_LINE(Hello);   -- Identifier is case-insensitive 
+		DBMS_OUTPUT.PUT_LINE("Begin"); -- Identifier is case-sensitive 
+	END;
+	/
+	
+2.2.3 Literals 
+	A literals is a value that is neither represented by an identifier not calculated from other values.
+	For example, 123 is an integer literal and 'abc' is a character literal, but 1+2 is not a literal.
+	
+	PL/SQL literals include all SQL literals and BOOLEAN literals.
+	A BOOLEAN literals is the predefined logical value TRUE, FALSE, or NULL.
+	NULL represents an unknown value.
+	
+2.2.4 Pragmas 
+	A pragma is an isntruction to the compiler that it processes at compile time.
+	A pragma begins with a reserved word PARMA followed by the name of the pargma.
+	A pragma may appear before a declartion or a statement.
+	pragma ::= 
+				autonomous_trans_pragma
+				coverage_pragma
+				deprecate_pragma
+				exception_init_pragma
+				inline_pragma
+				restrict_references_pragma
+				serially_resuable_pragma
+				udf_pragma 
+				
+	
+2.2.5.1 Sigle-Line Comments
+	A single-line comment begins with -- and extends to the end of the line.
+	
+	Exaple 2-6 Single-Line Comments 
+	DECLARE 
+		howmany		NUMBER;
+		num_tables	NUMBER;
+	BEGIN	
+		-- Begin processing 
+		SELECT COUNT(*) INTO howmany 
+		FROM USER_OBJECTS
+		WHERE OBJECT_TYPE = 'TABLE'; -- Check number of tables
+		num_tables := howmany;		 -- Compute another value 
+	END;
+	/
+	
+2.2.5.2 Multiline Comments 
+	A multiline comment begins with /*, ends with */, and can span multiple lines.
+	One multiline comment cannot contain another multiline comment.
+	A multiline comment can contain a single line comment.
+	
+	Example 2-7 Multiline Comments 
+	DECLARE 
+		some_condition	BOOLEAN;
+		pi				NUMBER := 3.1415926;
+		radius			NUMBER := 15;
+		area			NUMBER;
+	BEGIN	
+		/* Perform some simple tests and assignments */
+		IF 2 + 2 = 4 THEN
+			some_condition := True;
+		/* we expect this THEN to always be performed */
+		END IF;
+		
+		/* This line computes the area of a circle using pi,
+		which is the ratio between the circumference and diameter.
+		After the area is computed, the result is displayed. */
+		
+		area = pi * radius**2;
+		DBMS_OUTPUT.PUT_LINE('The area is: '|| TO_CHAR(area));
+	END;
+	/
+	
+2.2.6 Whitespace Characters Between Lixical Units 
+	We can put whitespace characters between lexical units, which often makes our source text easier to read.
+	
+	Example 2-8 Whitespace Characters Improving Source Text Readability.
+	
+	DECLARE 
+		x	NUMBER := 10;
+		y	Number := 10;
+		max	NUMBER;
+	BEGIN
+		IF x>y THEN max:=x;ELSE max:=y;END IF;  --correct but hard to read 
+		
+		-- Easier to read 
+		IF x > y THEN 
+			max := x;
+		ELSE	
+			max := y;
+		END IF;
+	END;
+	/
+	
+2.3 Declarations 
+	A Declarations allocates storage space for a value of a specified data type, and names the 
+	storage location so that we can reference it.
+	We must declare objects before we can reference them. Declarations can appear in the 
+	declarative part of any block, subprogram, or package.
+	
+2.3.1 NOT NULL Constraint 
+	We can impose the NOT NULL constraint on a scalar variable or constant.
+	The NOT NULL constraint prevents assigning a null value to the item.
+	The item can acquire this constraint either implicitily (from the data type) or explicitily.
+	
+	A scalar variable declaration that specifies NOT NULL, either implicitly ot explicitly, must 
+	assign an initial value to the variable (because the default initial value for a scalar 
+	variable is NULL).
+	
+	PL/SQL treats any zero-length string as a NULL value. This includes values returnd by 
+	character functions and BOOLEAN expressions.
+	
+	Example 2-9 Variable Declaration with NOT NULL Constraint 
+	
+	DECLARE 
+		acct_id  INTEGER(4) NOT NULL := 9999;
+		a		 NATURALN			 := 9999;
+		b 		 POSITIVEN			 := 9999;
+		c 		 SIMPLE_INTEGER		 := 9999;
+	BEGIN	
+		NULL;
+	END;
+	/
+	
+	Example 2-10 Varibale Initialize to NULL values 
+	
+	DECLARE 
+		null_string 	VARCHAR2(80) := TO_CHAR('');
+		address			VARCHAR2(80);
+		zip_code		VARCHAR2(80) := SUBSTR(address, 25, 0);
+		name			VARCAHR2(80);
+		valid			BOOLEAN		 := (name != '');
+	BEGIN	
+		NULL;
+	END;
+	/
+		
+2.3.2 Declaring Variables 
+	A variable declaration always specifies the name and data type of the variable.
+	For most data types, a variable declaration can also specify an initial value.
+	The variable name must be a valid user-defined identifier.
+	The data type can be any PL/SQL data type. The PL/SQL data types includes the SQL data types.
+	A data type is either scalar (without internal components) or composite (with internal components).
+	
+	Example 2-11 Scalar Variable Declarations 
+	DECLARE 
+		part_number		NUMBER(6); 		-- SQL data type 
+		part_name		VARCHAR2(20);	-- SQL data type 
+		in_stock		BOOLEAN;		-- PL/SQL only data type 
+		part_price		NUMBER(6, 2)	-- SQL data type 
+		part_description	VARCHAR2(50)	-- SQL data type 
+	BEGIN 
+		NULL;
+	END;
+	/
+	
+	
+2.3.3 Declaring Constants 
+	A constant holds a value that does not change.
+	A constant declaration has two requirements: the keyword CONSTANT and the initial value of the constant.
+	
+	Example 2-12 Constant Declaration 
+	
+	DECLARE 
+		credit_limit		CONSTANT REAL		:= 5000.00;
+		max_days_in_year	CONSTANT INTEGER	:= 366;
+		urbal_legend		CONSTANT BOOLEAN	:= FALSE; 
+	BEGIN 
+		NULL;
+	END;
+	/
+	
+2.3.4 Initial Values of Variables and Constants 
+	In a variable declaration, the initial value is optional unless we specify the NOT NULL 
+	constraint. In a constant declartion, the initial value is required.
+	
+	If the declaration is iin a block or subprogram, the initial value is assigned to the variable or 
+	constant every time control passes to the block or subprogram. If the declaration is in a package 
+	specification, the initial value is assigned to the variable or constant for each session 
+	(wheather the variable or constant is public or private).
+	
+	To specify the initial value, use either the assignment operator (:=) or the keyword DEFAULT,
+	followed by an expression. 
+	
+	If we do not specify an initial value for a varibale, assign a value to it before using it in any other context.
+	
+	Example 2-12 Variable and Constant Declarations with Initial Values
+	DECLARE 
+		hours_worked	INTEGER	:=40;
+		employee_count	INTEGER	:=0;
+		
+		pi		CONSTANT	REAL := 3.14159;
+		radius 				REAL := 1;
+		area 				REAL := (pi * radius**2);
+	BEGIN 
+		NULL;
+	END;
+	/
+
+	Example 2-14 Varibale initialized to NULL by Default.
+	DECLARE 
+		counter	INTEGER; -- initial value is NULL by default.
+	BEGIN
+		counter := counter + 1;	-- NULL + 1 is still NULL 
+		
+		IF counter is NULL THEN 
+			DBMS_OUTPUT.PUT_LINE('counter is NULL.');
+		END IF;
+	END;
+	/
+
+2.3.5 Declaring Items using the %TYPE Attribute 
+	The %TYPE attribute lets us declare a data item of the same data type as a previously 
+	declared variable or column (without knowing what that type is). If the declaration of the 
+	referenced item changes, then the declaration of the referencing item changes accordingly.
+	
+	The syntax of the declaration is:
+	referencing_item referenced_item%TYPE;
+	
+	The referencing item inherits the following from the referenced item:
+	• Data type and size
+	• Constraints (unless the referenced item is a column)
+	The referencing item does not inherit the initial value of the referenced item. Therefore, if the
+	referencing item specifies or inherits the NOT NULL constraint, you must specify an initial value
+	for it.
+	The %TYPE attribute is particularly useful when declaring variables to hold database values.
+	The syntax for declaring a variable of the same type as a column is:
+	variable_name table_name.column_name%TYPE;
+	
+	Example 2-15 Declaring Variable of Same Type as Column 
+	DECLARE 
+		surname	employee.last_name%TYPE;
+	BEGIN	
+		DBMS_OUTPUT.PUT_LINE('surname='||surname);
+	END;
+	/
+	
+	Example 2-16 Declaring Variable of Same Type as Another Variable.
+	
+	DECLARE 
+		name	VARCHAR2(25) NOT NULL	:= 'Smit';
+		surname name%TYPE 				:= 'Jones';
+	BEGIN	
+		DBMS_OUTPUT.PUT_LINE('Name=' || name);
+		DBMS_OUTPUT.PUT_LINE('Surname=' || surname);
+	END;
+	/
+	
+	
+2.4 References to Identifiers 
+	When referencing an identifier, we use a name that is either simple, qualified, remote, or both qualified and remote.
+	
+	The simple name of an identifer is the name in its declaration. 
+	
+	DECLARE 
+		a INTEGER;	-- Declaration 
+	BEGIN 
+		a := 1;		-- Reference with simple name 
+	END;
+	/
+	
+	If an identifier is declared in a named PL/SQL unit, we can (and sometime must)
+	reference it with its qualified name. The syntax  (called dot notation) is:
+	unit_name.simple_identifier_name 
+	
+	For example if a package p declares identifier a, we can reference the identifier with the qualified  name p.a.
+	
+	If the identifier name an object on a remote database, we must reference it wil its remote name. 
+	
+	simple_identifier_name@link_to_remote_database 
+	
+	If the identifer is declared in a PL/SQL unit on a remote databse, we must reference 
+	it with its qualified remote name. 
+	unit_name.simple_identifier_name@link_to_remote_database 
+	
+	We can create synonyms for a remote schema objects, but we can not create synonyms for 
+	objects declared in PL/SQL subprogram or packages.
+	
+	Note:
+	You can reference identifiers declared in the packages STANDARD and
+	DBMS_STANDARD without qualifying them with the package names, unless you have
+	declared a local identifier with the same name.
+	
+2.5 Scope and Visibility of Identifiers.
+	The scope of an identifier is the region of a PL/SQL unit from which you can reference the
+	identifier. The visibility of an identifier is the region of a PL/SQL unit from which you can
+	reference the identifier without qualifying it. An identifier is local to the PL/SQL unit that
+	declares it. If that unit has subunits, the identifier is global to them.
+	
+	Example 2-17 Scope and Visibility of Identifiers 
+	
+	-- Outer block:
+	DECLARE 
+		a CHAR;	-- Scope of a (CHAR) begins 
+		b REAL;	-- Scope of b begins 
+	BEGIN	
+		-- Visible a (char), b 
+		
+		-- First sub-block:
+		DECLARE 
+			a INTEGER; 	-- Scope of a (INTEGER) begins 
+			c REAL;		-- Scope of c begins 
+		BEGIN	
+			-- Visible a (INTEGER), b, c 
+			NULL;
+		END; 	-- Scope of a (INTEGER) and c end 
+		
+		-- Second sub-block:
+		DECALRE 
+			d REAL; 	-- Scope of d begins 
+		BEGIN	
+			-- Visible: a (CHAR), b, d 
+			NULL;
+		END; 	-- Scope of d ends 
+		
+	-- Visible: a (CHAR), b 
+	END;	-- Scope of a (CHAR) and b end 
+	/
+	
+	Example 2-18 Qualifying Redeclared Global Indentifier with Block Label 
+	
+	<<outer>> -- label 
+	DECLARE 
+		birthdate DATE := TO_DATE('09-AUG-70', 'DD-MON-YY');
+	BEGIN	
+		DECLARE 
+			birthdate DATE := TO_DATE('29-SEP-70', 'DD-MON-YY');
+		BEGIN
+			IF birthdate = outer.birthdate THEN 
+				DBMS_OUTPUT.PUT_LINE('Same Birthdate');
+			ELSE 
+				DBMS_OUTPUT.PUT_LINE('Different Birthdate');
+			END IF; 
+		END; 
+	END;
+	/
+	
+	Example 2-19 Qualifying Identifier wuth Subprogram Name 
+	
+	CREATE OR REPLACE PROCEDURE check_credit(credit_limit NUMBER) AS 
+		rating NUMBER := 3;
+		
+		FUNCTION check_rating RETURN BOOLEAN IS 
+			rating	NUMBER :=1;
+			over_limit 	BOOLEAN;
+			
+		BEGIN 
+			IF check_credit.rating <= credit_limit THEN -- reference global variable 
+				over_limit := FALSE;
+			ELSE
+				over_limit := TRUE;
+				rating := credit_limit;
+			END IF;
+			RETURN over_limit;
+		END check_rating;
+		
+	-- main block start 
+	BEGIN
+		IF check_rating THEN 
+			DBMS_OUTPUT.PUT_LINE
+			('Credit rating over limit ( '|| TO_CHAR(credit_limit)|| '). '
+			|| 'Rating: '|| TO_CHAR(rating));
+		ELSE
+			DBMS_OUTPUT.PUT_LINE 
+			('Credit rating OK. '|| 'Rating: '|| TO_CHAR(rating));
+		END IF;
+	END;
+	/
+		
+	BEGIN 
+		check_credit(1);
+	END;
+	/
+	
+	Example 2-20 Duplicate Identifier in Same Scope 
+	We can not declare the same identifier twice in the same PL/SQL unit. 
+	
+	BEGIN
+		id 	BOOLEAN;
+		id	VARCHAR2(5); -- duplicate identifier 
+	BEGIN 
+		id := FALSE;
+	END;
+	/
+	
+	Example 2-21 Declaring Same Identifier in Different Units 
+	
+	DECLARE 
+		PROCEDURE p 
+		IS 
+			x VARCHAR2(1);
+		BEGIN 
+			x := 'a';	-- Assign the value 'a' to x 
+			DBMS_OUTPUT.PUT_LINE 
+			('In Procedure p, x = '|| x);
+		END;
+		
+		PROCEDURE q 
+		IS 
+			x VARCAHR2(1);
+		BEGIN 
+			x := 'b';	-- Assign the value 'b' to x 
+			DBMS_OUTPUT.PUT_LINE
+			('In Procedure q, x = '|| x);
+		END;
+	BEGIN 
+		p;
+		q;
+	END;
+	/
+	
+	Example 2-22 Label and Subprogram with Same Name in Same Scope 
+	
+	<<echo>>
+	DECLARE 
+		x NUMBER := 5;
+		
+		PROCEDURE echo AS 
+			x	NUMBER := 0;
+		BEGIN
+			DBMS_OUTPUT.PUT_LINE('x = '|| x);
+			DBMS_OUTPUT.PUT_LINE('echo.x = '|| echo.x);			
+		END;
+		
+	BEGIN 
+		echo;
+	END;
+	/
+	
+	Example 2-23 Block with Multiple and Duplicate Labels 
+	
+	<<compute_ratio>>
+	
+	<<another_label>>
+	DECLARE 
+		numerator	NUMBER := 22;
+		denominator	NUMBER := 7;
+	BEGIN
+		<<another_label>>
+		DECLARE 
+			denominator	NUMBER := 0;
+		BEGIN	
+			DBMS_OUTPUT.PUT_LINE
+			('Ratio with computing_ratio.denominator =');
+			DBMS_OUTPUT.PUT_LINE
+			(numerator / compute_ratio.denominator);
+			
+			DBMS_OUTPUT.PUT_LINE
+			('Ratio with another_label.denominator = ');
+			DBMS_OUTPUT.PUT_LINE
+			(numerator / another_label.denominator);
+			
+		EXCEPTION 
+			WHEN ZERO_DIVIDE THEN 
+				DBMS_OUTPUT.PUT_LINE
+				('Division-by-zero error: can''t divide '
+				|| numerator || ' by '|| denominator);
+			WHEN OTHERS THEN 
+				DBMS_OUTPUT.PUT_LINE
+				('Unexpected error.');
+		END another_label;
+	END compute_ratio;
+	/
+	
+2.6 Assigning Values to Varibale 
+
+	After declaring a variable, we can assign a value to it in these ways:
+	. Use the assignment statement to assign it the value of an expression.
+	. Use the SELECT INTO or FETCH statement to assign it a value from a table.
+	. Pass it to a subprogram as an OUT or IN OUT parameter, and then assign the value inside 
+	  the subprogram.
+	The variable and the value must have compatible data types. One data type is compatible 
+	with another data type if it can be implicitly converted to that type.
+	
+2.6.1 Assigning Values to Variables with the Assignment Statement 
+	
+	To assign the value of an expression to a variable, use this form of the assignment statement:
+	
+	variable_name := expression;
+	
+	Example 2-24 Assigning Values to Variables with Assignment Statement. 
+	
+	DECLARE  -- We can assign initial values here 
+		wages			NUMBER;
+		hours_worked	NUMBER  := 40;
+		hourly_salary	NUMBER  := 22.50;
+		bonus			NUMBER  := 150;
+		country			VARCHAR2(128);
+		counter			NUMBER  := 0;
+		done			BOOLEAN; 
+		valid_id		BOOLEAN; 
+		emp_rec1		employees%ROWTYPE;
+		emp_rec2		employees%ROWTYPE;
+		TYPE commissions IS TABLE OF NUMBER INDEX BY PLS_INTEGER;
+		comm_tab		commissions;
+		
+	BEGIN	-- We can assign values here too; 
+		wages := (hours_worked * hourly_salary) + bonus;
+		country := 'France';
+		country := UPPER('India');
+		done : (counter > 100);
+		valid_id := True;
+		emp_rec1.first_name := 'Antonio';
+		emp_rec1.last_name := 'Ortiz';
+		emp_rec1 := emp_rec2;
+		comm_tab(5) := 20000 ) 0.15;
+	END;
+	/
+	
+2.6.2 Assigning Values to Variables with the SELECT INTO Statement 
+	A simple of the SELECT INTO statement is:
+	
+	SELECT select_item [, select_item]...
+	INTO varibale_name [, variable_name]...
+	FROM table_name;
+	
+	for each select_item, there must be a corresponding, type-compatible variable_name.
+	
+	Example 2-15 Assigning value to Variable with SELECT INTO Statement .
+	DECLARE
+		bonus	NUMBER(8, 2);
+	BEGIN	
+		SELECT salary * 0.10 INTO bonus 
+		FROM emplouees 
+		WHERE employee_id = 100;
+		
+		DBMS_OUTPUT.PUT_LINE('Bonus = '|| TO_CHAR(bonus));
+	END;
+	/
+	
+	
+2.6.3 Assigning Values to Variable as Parameters of a Subprogram 
+	If we pass a variable to a subprogram as an OUT ot IN OUT parameter, and the subprogram 
+	assigns a value to the parameter, the variable retains that value after the subprogram finishes
+	running. 
+	
+	Example 2-26 Assigning Value to Variable as IN OUT Subprogram Parameter.
+	
+	DECLARE 
+		emp_salary	NUMBER(8, 2);
+		
+		PROCEDURE adjust_salaray(
+		emp 	NUMBER,
+		sal IN OUT NUMBER,
+		adjustment NUMBER
+		) IS 
+		BEGIN
+			sal := sal + adjustment;
+		END;
+	BEGIN 
+		SELECT salary into emp_salary
+		FROM employees 
+		WHERE employee_id = 100;
+		
+		DBMS_OUTPUT.PUT_LINE
+		('Before invoking procedure, emp_salary: '|| emp_salary);
+		
+		adjust_salary(100, emp_salary, 1000);
+		
+		DBMS_OUTPUT.PUT_LINE
+		('After invoking procedure, emp_salary: '|| emp_salary);
+	END;
+	/
+	
+2.6.4 Assigning Values to BOOLEAN Variables 
+	The only values that we can assign to a BOOLEAN variable are TRUE, FALSE, and NULL.
+	
+	Example 2-27 Assigning Value to BOOLEAN Variable 
+	
+	DECLARE 
+		done	BOOLEAN;	-- Initial value is NULL by default 
+		counter	NUMBER := 0; 
+	BEGIN 
+		done := FALSE;		-- Assign Literal value 
+		WHILE  done != TRUE	-- Compare to literal value 
+			LOOP
+				counter := counter + 1;
+				done := (counter > 500); -- Assign value of BOOLEAN expression 
+			END LOOP;
+	END;
+	/
+	
+2.7	Expressions 
+	An expressions is a combination of one or more values, operators, and SQL functions 
+	that evaluates to a value.
+	
+	An expression always returns a single value. 
+	1. A single constant or variable (for example a)
+	2. A unary operator and its single operand (for example, -a)
+	3. A binary operator and its two operands (for example, a+b)
+	
+	An operand can be a variable, constant, literal, operator, function invocation, or
+	placeholder—or another expression. Therefore, expressions can be arbitrarily
+	complex
+	
+2.7.1 Concatination Operator 
+	The concatenation operator (||) appends one string operand to another.
+	The concatenation operator ignores null operands 
+	
+	Example 2-28 Concatenation Operator 
+	
+	DECLARE 
+		x	VARCHAR2(4) := 'suit';
+		y 	VARCHAR2(4) := 'case';
+	BEGIN 
+		DBMS_OUTPUT.PUT_LINE(x || y);
+	END;
+	/
+	
+	Example 2-29 Concatination Operator with NULL Operands 
+	BEGIN 
+		DBMS_OUTPUT.PUT_LINE('apple' || NULL || NULL || 'sauce');
+	END;
+	/
+	
+2.7.2 Operator Precedence 
+	An operation is either a unary operator and its single operand or a binary operator
+	and its two operands. The operations in an expression are evaluated in order of
+	operator precedence
+	
+	Operator Precedence 
+	
+	Operator 											Operation 
+	**													exponentiation
+	+, -												identity, negation 
+	*, /												multiplication, division 
+	+, -, ||											Addition, subtraction, concatenation
+	=,<,>,>=,<=,<>,!=,~=,^=,IS NULL,LIKE,BETWEEN,IN 	comparision 
+	NOT													negation 
+	AND													conjuction 
+	OR 													inclusion 
+	
+	To control the order of evaluation, enclose operations in parentheses.
+	
+	Example 2-30 Controlling Evaluation Order with Parentheses 
+	
+	DECLARE 
+		a INTEGER	:= 1+2**2;
+		b INTEGER	:= (1+2)**2;
+	BEGIN 
+		DBMS_OUTPUT.PUT_LINE('a = ' || TO_CAHR(a));
+		DBMS_OUTPUT.PUT_LINE('b = ' || TO_CAHR(b));
+	END;
+	/
+	
+	Example 2-31 Expression with Nested Parentheses 
+	
+	DECLARE 
+		a 	INTEGER := ((1+2) * (3+4)) / 7;
+	BEGIN 
+		DBMS_OUTPUT.PUT_LINE('a = '|| TO_CHAR(a));
+	END;
+	/
+	
+	Example 2-32 Improving Redability with Parentheses 
+	
+	DECLARE 
+		a 	INTEGER := 2**2*3**2
+		b 	INTEGER := (2**2)*(3**2);
+	BEGIN 
+		DBMS_OUTPUT.PUT_LINE('a = ' || TO_CHAR(a));
+		DBMS_OUTPUT.PUT_LINE('b = ' || TO_CHAR(b));
+	END;
+	/
+	
+	Example 2-33 Operator Precedence 
+	
+	DECLARE 
+		salary 		NUMBER := 60000;
+		commission	NUMBER := 0.10;
+	BEGIN 
+		-- Division has higher precedence than addition:
+		
+		DBMS_OUTPUT.PUT_LINE('5 + 12 / 4 = ' || TO_CHAR(5 + 12 / 4));
+		DBMS_OUTPUT.PUT_LINE('12 / 4 + 5 = ' || TO_CHAR(12 / 4 + 5));
+		
+		-- Parentheses Override default operator precedence:
+		
+		DBMS_OUTPUT.PUT_LINE('8 + 6 / 2 = ' || TO_CHAR(8 + 6 / 2));
+		DBMS_OUTPUT.PUT_LINE('(8 + 6) / 2 = ' || TO_CHAR((8 + 6) / 2));
+		
+		-- Most deeply nested operation is evaluated first:
+		
+		DBMS_OUTPUT.PUT_LINE('100 + (20 / 5 + (7 - 3)) = '
+							|| TO_CHAR(100 + (20 / 5 (7 - 3))));
+							
+		-- Parenthese , even when unnecessary, improve readability:
+		
+		DBMS_OUTPUT.PUT_LINE('(salary * 0.05) + (commission * 0.25) = '
+		|| TO_CHAR((salary * 0.05) + (commission * 0.25))
+		);
+		
+		DBMS_OUTPUT.PUT_LINE('salary * 0.05 + commission * 0.25 = ' 
+		|| TO_CHAR(salary * 0.05 + commission * 0.05)
+		);
+	END;
+	/
+	
+2.7.3 Logical Operators 
+	The logical operators AND, OR and NOT follow a tri-state logic 
+	Table 2-4 Logical Truth Table
+	x 		y 		x AND y 	x OR y 	NOT x
+	TRUE 	TRUE 	TRUE 		TRUE 	FALSE
+	TRUE 	FALSE 	FALSE 		TRUE 	FALSE
+	TRUE 	NULL 	NULL 		TRUE 	FALSE
+	FALSE 	TRUE 	FALSE 		TRUE 	TRUE
+	FALSE 	FALSE	FALSE 		FALSE 	TRUE
+	FALSE 	NULL 	FALSE 		NULL 	TRUE
+	NULL 	TRUE 	NULL 		TRUE 	NULL
+	NULL 	FALSE 	FALSE 		NULL 	NULL
+	NULL 	NULL 	NULL 		NULL 	NULL
+	
+	AND returns TRUE if and only if both operands are TRUE.
+	
+	OR returns TRUE if either operand is TRUE. 
+	
+	NOT returns the opposite of its operand, nuless the operand is NULL.
+	
+	NOTNULL returns NULL, because NULL is an indeterminate value. 
+	
+	Example 2-34 Procedure Prints BOOLEAN Variable 
+	
+	CREATE OR REPLACE PROCEDURE print_boolean(
+		b_name	VARCAHR2,
+		b_value	BOOLEAN
+		) AUTHID DEFINER IS 
+	BEGIN
+		IF b_value IS NULL THEN 
+			DBMS_OUPUT.PUT_LINE(b_name || ' = NULL');
+		ELSIF b_value = TRUE THEN 
+			DBMS_OUTPUT.PUT_LINE(b_name || ' = TRUE');
+		ELSE 
+			DBMS_OUTPUT.PUT_LINE(b_name || ' = FALSE');
+		END IF; 
+	END;
+	/
+	
+	Example 2-35 AND Operator 
+	
+	DECLARE 
+		PROCEDURE print_x_and_y (
+			x BOOLEAN,
+			y BOOLEAN
+		) IS 
+		BEGIN 
+			print_boolean ('x', x);
+			print_boolean ('y', y);
+			print_boolean ('x AND y', x AND y);
+		END print_x_and_y;
+	BEGIN 
+		print_x_and_y (FALSE, FALSE);
+		print_x_and_y (TRUE, FALSE);
+		print_x_and_y (FALSE, TRUE);
+		print_x_and_y (TRUE, TRUE);
+		
+		print_x_and_y (TRUE, NULL);
+		print_x_and_y (FALSE, NULL);
+		print_x_and_y (NULL, TRUE);
+		print_x_and_y (NULL, FALSE);
+	END;
+	/
+	
+	Example 2-36 OR Operator 
+	
+	DECLARE 
+		PROCEDURE print_x_or_y(
+		x BOOLEAN,
+		y BOOLEAN
+		) IS 
+		BEGIN
+			print_boolean('x', x);
+			print_boolean('y', y);
+			print_boolean('x or y', x or y);
+		END print_x_or_y;
+	BEGIN 
+		print_x_or_y(FALSE, FALSE);
+		print_x_or_y(TRUE, FALSE);
+		print_x_or_y(FALSE, TRUE);
+		print_x_or_y(TRUE, TRUE);
+		
+		print_x_or_y(TRUE, NULL);
+		print_x_or_y(FALSE, NULL);
+		print_x_or_y(NULL, TRUE);
+		print_x_or_y(NULL, FALSE);
+	END;
+	/
+	
+	Example 2-37 NOT Operator 
+	
+	DECLARE 
+		PROCEDURE print_not_x(
+		x BOOLEAN 
+		) IS 
+		BEGIN 
+			print_boolean('x', x);
+			print_boolean('NOT x', NOT x);
+		END print_not_x;
+	BEGIN 
+		print_not_x(TRUE);
+		print_not_x(FALSE);
+		print_not_x(NULL);
+	END;
+	/
+	
+	Example 2-38 NULL Value in Unequal Comparison 
+	DECLARE 
+		x	NUMBER := 5;
+		y 	NUMBER := NULL:
+	BEGIN 
+		IF x != y THEN 	-- yields NULL, not TRUE 
+			DBMS_OUPUT.PUT_LINE('x != y'); -- not run 
+		ELSIF x = y THEN 	-- also yields NULL 
+			DBMS_OUTPUT.PUT_LINE('x = y');
+		ELSIF
+			DBMS_OUPUT.PUT_LINE
+			('Can''t tell if x and y are equal or not.');
+		END IF;
+	END;
+	/
+	
+	Example 2-39 NULL Value in Equal Comparison 
+	DECLARE 
+		a NUMBER := NULL;
+		b Number := NULL;
+	BEGIN 
+		IF a = b THEN 
+			DBMS_OUPUT.PUT_LINE('a = b'); 
+		ELSIF a != b THEN 
+			DBMS_OUPUT.PUT_LINE('a != b');
+		ELSE	
+			DBMS_OUPUT.PUT_LINE('Can''t tell if two NULLs are equal');
+		END IF;
+	END;
+	/
+	
+	Example 2-40 NOT NULL Equals NULL 
+	DECLARE 
+		x	INTEGER := 2;
+		y 	INTEGER := 5;
+	BEGIN 
+		IF (x > y)		-- If x or y is NULL, then (x > y) is NULL 
+			then high := x;
+		ELSE 
+			high := y;
+		END IF; 
+		
+		IF NOT (x > y) 	-- if x or y is NULL then NOT (x > y) is NULL 
+			THEN high := y;
+		ELSE 
+			high := x;
+		END IF;
+	END;
+	/
+	
+	Example 2-41 Changing Evaluation Order of Logical Operators 
+	DECLARE 
+		x	BOOLEAN := FALSE;
+		y 	BOOLEAN := FALSE; 
+	BEGIN 
+		print_boolean('NOT x AND y', NOT x AND y);
+		print_boolean('NOT (x AND y)', NOT (x AND y));
+		print_boolean('(NOT x) AND y', (NOT x) AND y);
+	END;
+	/
+	
+-- 2.7.4 Short-Circuit Evaluation 
+	When evaluating a logical expression, PL/SQL uses short-circuit evaluation.
+	That is PL/SQL stop evaluating the expression as soon as it can determine the result.
+	
+	Example 2-42 Short-Circuit Evaluation 
+	DECLARE 
+		on_hand		INTEGER := 0;
+		on_order	INTEGER	:= 100;
+	BEGIN 
+		-- Dies not cause divide-by-zero error;
+		-- evaluation stop after first expression 
+		
+		IF (on_hand = 0) OR ((on_order / on_hand) < 5) THEN 
+			DBMS_OUTPUT.PUT_LINE('On hand quantity is zero.');
+		END IF;
+	END;
+	/
+	
+2.7.5 Comparison Operator 
+	Comparison operator compare one expression to another. The result is always either TRUE, FALSE or NULL.
+	If the value of one expression is NULL, then the result of the comparison is also NULL.
+	
+	Note: Using CLOB values with comparison operator can create temporary LOB values.
+		  Ensure that our temporary tablespace is large enough to handle them.
+		  
+2.7.5.1 IS [NOT] NULL Operator 
+	The IS NULL operator returns the BOOLEAN value TRUE if its operand is NULL or FALSE if it is not NULL.
+	The IS NOT NULL operator does the opposite.
+	Comparisons involving NULL always yield NULL.
+	
+2.7.5.2 Relatioanl Operators 
+	=					equal to 
+	<>, !=, ~=, ^=		not equal to 
+	<					less than 
+	> 					greater than 
+	<=					less than or equal to 
+	>= 					greater than or equal to 
+	
+2.7.5.2.1	Arithmetic Comparisons 
+	One number is greater than another if it represnets a larger quantity.
+	Real numbers are stored as approximate values, so Oracle recommends them for 
+	equality or inequality 
+	
+	Example 2-43 Relational Operators in Expression 
+		BEGIN
+			print_boolean('(2 +2 = 4)', 2 + 2 = 4);
+			print_boolean ('(2 + 2 <> 4)', 2 + 2 <> 4);
+			print_boolean ('(2 + 2 != 4)', 2 + 2 != 4);
+			print_boolean ('(2 + 2 ~= 4)', 2 + 2 ~= 4);
+			print_boolean ('(2 + 2 ^= 4)', 2 + 2 ^= 4);
+			print_boolean ('(1 < 2)', 1 < 2);
+			print_boolean ('(1 > 2)', 1 > 2);
+			print_boolean ('(1 <= 2)', 1 <= 2);
+			print_boolean ('(1 >= 1)', 1 >= 1);
+		END;
+		/
+		
+2.7.5.2.2 BOOLEAN Comparisons 
+	By defining, TRUE is greater than FALSE. Any comparison with NULL returns NULL.
+
+2.7.5.2.3 Character Comparisons 
+	By default, one character is greater than another if its binary value is larger.
+	
+	For example 
+	'y' > 'r' 
+	
+	Strings are compared character by character. 
+	For example 
+	'Kathy' > 'Kathryn'
+	
+	If you set the initialization parameter NLS_COMP=ANSI, string comparisons use the
+	collating sequence identified by the NLS_SORT initialization parameter.
+	A collating sequence is an internal ordering of the character set in which a range of
+	numeric codes represents the individual characters. One character value is greater
+	than another if its internal numeric value is larger. 
+	
+	A case-insensitive comparison treats corresponding uppercase and lowercase
+	letters as the same letter. For example, these expressions are true:
+	'a' = 'A'
+	'Alpha' = 'ALPHA'
+	To make comparisons case-insensitive, append _CI to the value of the NLS_SORT
+	parameter (for example, BINARY_CI or XGERMAN_CI).
+	An accent-insensitive comparison is case-insensitive, and also treats letters that
+	differ only in accents or punctuation characters as the same letter. For example, these
+	expressions are true:
+	'Cooperate' = 'Co-Operate'
+	'Co-Operate' = 'coöperate'
+	To make comparisons both case-insensitive and accent-insensitive, append _AI to the
+	value of the NLS_SORT parameter (for example, BINARY_AI or FRENCH_M_AI).
+	
+2.7.5.2.4 Date Comparisons 
+	One date is greater than another if it is more recent.
+	For example 
+	'01-JAN-91' > '31-DEC-90'
+
+2.7.5.3 LIKE Operator 
+	The LIKE operator compares a character, string or CLON value to a pattern and returns TRUE 
+	if the value matches the pattern and FALSE if it does not.
+	
+	The pattern can include the two wildcard characters 
+	underscore(_) and percent sign (%.
+	
+	Underscore (_) matches exact one character.
+	Percent sign (%) matches zero or more characters.
+	
+	Example 2-44 LIKE Operator in Expression 
+	
+	DECALRE 
+		PROCEDURE compare(
+		value	VARCHAR2,
+		pattern	VARCHAR2
+		) IS 
+		BEGIN 
+			IF value LIKE pattern THEN 
+				DBMS_OUPUT.PUT_LINE('TRUE');
+			ELSE 
+				DBMS_OUPUT.PUT_LINE('FALSE');
+			END IF; 
+		END;/
+	BEGIN 
+		compare('Johnson', 'J%s_n');
+		compare('Johnson', 'J%S_N');
+	END;
+	/
+	
+	Example 2.45 Escape Character in Pattern 
+	
+	DECLARE 
+		PROCEDURE half_off (sale_sign VARCHAR2) IS 
+		BEGIN 
+			IF sale_sign LIKE '50\% off!' ESCAPE '\' THEN 
+				DBMS_OUPUT.PUT_LINE('TRUE');
+			ELSE 
+				DBMS_OUPUT.PUT_LINE('FALSE'); 
+			END IF; 
+		END; 
+	BEGIN 
+		half_off('Going out of Business!');
+		half_off('50% off!');
+	END;
+	/
+	
+2.7.5.4 BETWEEN Operator 
+	The BETWEEN operator tests wheather a value lies in a specified range.
+	The value of the expression x BETWEEN a AND b is defined to be the same as the 
+	value of the expression (x >= a) and (x <= b). The expression x will be evaluated once.
+	
+	Example 2-46 BETWEEN Operator in Expression 
+		
+	BEGIN 
+		print_boolean('2 BETWEEN 1 AND 3', 2 BETWEEN 1 AND 3);
+		print_boolean('2 BETWEEN 2 AND 3', 2 BETWEEN 2 AND 3);
+		print_boolean('2 BETWEEN 1 AND 2', 2 BETWEEN 1 AND 2);
+		print_boolean('2 BETWEEN 3 AND 4', 2 BETWEEN 3 AND 4);
+	END;
+	/
+	
+	
+2.7.5.5 IN Operator 
+	The IN operator tests set membership.
+	x IN (set) returns TRUE of x equals a member of set. 
+	
+	Example 2-47 IN Operator in Expression 
+	
+	DECLARE 
+		letter VARCHAR2(1) := 'm';
+	BEGIN 
+		print_boolean(
+			'letter IN (''a'', ''b'', ''c'')', 
+			letter in ('a', 'b', 'c')
+			);
+		print_boolean(
+			'letter IN (''z'', ''m'', ''y'', ''p'')',
+			letter IN ('z', 'm', 'y', 'p')
+			);
+	END;
+	/
+	
+	
+	Example 2-48 IN Operator with Sets with NULL Values 
+	
+	DECLARE 
+		a 	INTEGER; 		-- Initialized to NULL by default 
+		b 	INTEGER := 10;
+		c 	INTEGER := 100;
+	BEGIN 
+		print_boolean ('100 in (a, b, c)', 100 IN (a, b, c));
+		print_boolean ('100 in (a, b, c)', 100 NOT IN (a, b, c));
+		
+		print_boolean ('100 in (a, b)', 100  IN (a, b));
+		print_boolean ('100 in (a, b)', 100 NOT IN (a, b));
+		
+		print_boolean ('a in (a, b)', a  IN (a, b));
+		print_boolean ('a in (a, b)', a NOT IN (a, b));
+	END;
+	/
+	
+	
+2.7.6 BOOLEAN Expression 
+	A BOOLEAN Expression is an expression that returns a BOOLEAN value- TRUE, FALSE or NULL.
+	The simplest BOOLEAN expression is a BOOLEAN literal, constant, or variable.
+	The following are also BOOLEAN expression.
+	
+	NOT boolean_expression 
+	boolean_expression relational_operator boolean_expression 
+	boolean_expression {AND | OR} boolean_expression 
+	
+	Example 2-49 Equivalent BOOLEAN Expression 
+	DECLARE 
+		done BOOLEAN;
+	BEGIN 
+		-- These While loops are equaivalent 
+		
+		done := FALSE;
+		WHILE done = FALSE
+			LOOP
+				done := TRUE;
+			END LOOP;
+		
+		done := FALSE;
+		WHILE NOT (done = TRUE)
+			LOOP
+				done := TRUE;
+			END LOOP;
+		done := FALSE;
+		WHILE NOT done 
+			LOOP
+				done := TRUE;
+			END LOOP;
+	END;
+	/
+	
+	
+2.7.7 CASE Expression 
+	. Simple CASE Expression 
+	. Searched CASE Expression 
+	
+2.7.7.1 Simple CASE Expression 
+	For this explanation, assume that a simple CASE expression has this syntax 
+	
+	CASE selector 
+	WHEN selector_value_1 THEN result_1 
+	WHEN selector_value_2 THEN result_2 
+	...
+	WHEN selector_value_n THEN result_n 
+	[ ELSE	
+		else_result ]
+	END 
+	
+	
+	The selector is an expression.
+	Each selector_value and each result can be wither a literal or an expression.
+	Al leat one result must not be the literal NULL.
+	
+	The simple CASE expression returns the first result for which selector_value matches
+	selector. Remaining expression are not evaluated, If no selector_value matches selector, 
+	the CASE expression returns else_result if it exits and NULL otherwise.
+	
+	
+	Example 2-50 Simple CASE Expression 
+	DECLARE 
+		grade CHAR(1) := 'B';
+		appraisal	VARCHAR2(20);
+	BEGIN 
+		appraisal := 
+		CASE grade 
+			WHEN 'A' THEN 'Excellent'
+			WHEN 'B' THEN 'Very Good'
+			WHEN 'C' THEN 'Good'
+			WHEN 'D' THEN 'Fair'
+			WHEN 'F' THEN 'Poor'
+			ELSE 'No such grade'
+		END;
+		DBMS_OUTPUT.PUT_LINE('Grade '|| grade || ' is ' || appraisal);
+	END;
+	/
+	
+	Example 2-51 Simple CASE Expression with WHEN NULL 
+	
+	If the selector has the value NULL, it cannot be matched by WHEN NULL.
+	Instead, use a searched CASE expression with WHEN boolean_expression IS NULL.
+	
+	DECLARE 
+		grade 		CHAR(1);		-- NULL by Default 
+		appraisal	VARCHAR2(20);
+	BEGIN
+		appraisal := 
+		CASE grade 
+			WHEN NULL THEN 'No Grade Assigned'
+			WHEN 'A' THEN 'Excellent'
+			WHEN 'B' THEN 'Very Good'
+			WHEN 'C' THEN 'Good' 
+			WHEN 'D' THEN 'Fair'
+			WHEN 'F' THEN 'Poor'
+			ELSE 'No such Grade'
+		END;
+		DBMS_OUTPUT.PUT_LINE('Grade '|| grade || ' is ' || appraisal);
+	END;
+	/
+		
+2.7.7.2 Searched CASE Expression 
+	For this explanation, assume that a searched CASE expression has this syntax 
+	
+	CASE 
+	WHEN boolean_expression_1 THEN result_1 
+	WHEN boolean_expression_2 THEN result_2 
+	...
+	WHEN booleand_expression_n THEN result_n 
+	[ ELSE 
+		else_result ]
+	END
+	
+	The searched CASE expression returns the first result for which boolean_expression is TRUE.
+	Remaining expression are not evaluted. If no boolean_expression is TRUE, the CASE expression 
+	return else_result if it exists and NULL otherwise.
+	
+	Example 2-52 Searched CASE Expression 
+	
+	DECLARE 
+		grade 		CHAR(1) := 'B';
+		appraisal	VARCHAR2(120);
+		id 			NUMBER := 8429862 
+		attendance	NUMBER := 150;
+		min_days	CONSTANT NUMBER := 200;
+		
+		FUNCTION attends_this_school (id NUMBER)
+			RETURN BOOLEAN IS 
+		BEGIN 
+			RETURN TRUE;
+		END;
+	BEGIN 
+		appraisal := 
+		CASE 
+		when attends_this_school(id) = FALSE 
+			THEN 'Student not enrolled'
+		WHEN grade = 'F' or attendance < min_days 
+			THEN 'Poor performace or n=bad attendance'
+		WHEN grade = 'A' THEN 'Excellent'
+		WHEN grade = 'B' THEN 'Very Good'
+		WHEN grade = 'C' THEN 'Good'
+		WHEN grade = 'D' THEN 'Fair'
+		ELSE 'No such Grade'
+		END;
+		DBMS_OUTPUT.PUT_LINE('Result for student '|| id || ' is '|| appraisal);
+	END;
+	/
+	
+	Example 2-53 Searched CASE Expression with WHEN  ... IS NULL 
+	
+	DECLARE 
+		grade CHAR(1); 	-- NULL by default 
+		appraisal VARCHAR2(20);
+	BEGIN 
+		appraisal := 
+		CASE
+			WHEN grade IS NULL THEN 'No Grade assigned'
+			WHEN grade = 'A' THEN 'Excellent'
+			WHEN grade = 'B' THEN 'Very Good'
+			WHEN grade = 'C' THEN 'Good'
+			WHEN grade = 'D' THEN 'Fair'
+			WHEN grade = 'F' THEN 'Poor'
+			ELSE 'No such Grade'
+		END;
+		DBMS_OUTPUT.PUT_LINE('Grade '|| grade || ' is ' || appraisal);
+	END;
+	/
+	
+2.7.8 SQL Functions in PL/SQL Expression 
+	In PL/SQL expression, we can use all SQL functions except:
+		. Aggregate functions (such as AVG and COUNT)
+		. Analytical function (such as LAG and RATIO_TO_REPORT)
+		. Data mining functions (such as CLUSTER_ID, and FEATURE_VALUE)
+		. Encoding and Decoding functions (such as DECODE and DUMP)
+		. Model functions (such as ITERATION_NUMBER and PREVIOUS)
+		. Object reference functions (such as REF and VALUE)
+		. XML functions 
+		. These conversion functions 
+			- BIN_TO_NUM 
+		• These JSON SQL operators:
+		– JSON_ARRAYAGG
+		– JSON_EQUAL
+		– JSON_OBJECTAGG
+		– JSON_TABLE
+		– JSON_TEXTCONTAINS
+		• These collation SQL operators and functions:
+		– COLLATE
+		– COLLATION
+		– NLS_COLLATION_ID
+		– NLS_COLLATION_NAME
+		• These miscellaneous functions:
+		– CUBE_TABLE
+		– DATAOBJ_TO_PARTITION
+		– LNNVL
+		– NVL2
+		– SYS_CONNECT_BY_PATH
+		– SYS_TYPEID
+		– WIDTH_BUCKET
+		PL/SQL supports an overload of BITAND for which the arguments and result are
+		BINARY_INTEGER.
+
+2.7.9 Static Expressions
+	A static expression is an expression whose value can be determined at compile time
+	that is, it does not include character comparisons, variables, or functions invocations.
+	Static expression are the only expressions that can appear in conditional compilation directives.
+	
+	Definition of Static Expression 
+		. An expression is static if it is the NULL literal 
+		. An expression is static if it is a character, numeric, or boolean literal.
+		. An expression is static if it is a reference to a static constant. 
+		. An expression is static if it is a reference tp a condition compilation variable begun with $$.
+		• An expression is static if it is an operator is allowed in static expressions, if all of its
+		  operands are static, and if the operator does not raise an exception when it is evaluated
+		  on those operands.
+	Table 2-6 Operators Allowed in Static Expressions
+	Operators 								Operators Category
+	---------------------					----------------------------
+	() 										Expression delimiter
+	** 										exponentiation
+	*, /,+, - 								Arithmetic operators for multiplication, division,
+											addition or positive, subtraction or negative
+	=, !=, <, <=, >=, > IS [NOT] NULL 		Comparison operators
+	NOT 									Logical operator
+	[NOT] LIKE, [NOT] LIKE2, [NOT] LIKE4,
+	[NOT]	LIKEC							Pattern matching operators
+	XOR 									Binary operator
+	
+	This list shows functions allowed in static expressions.
+	• ABS
+	• ACOS
+	• ASCII
+	• ASCIISTR
+	• ASIN
+	• ATAN
+	• ATAN2
+	• BITAND
+	• CEIL
+	• CHR
+	• COMPOSE
+	• CONVERT
+	• COS
+	• COSH
+	• DECOMPOSE
+	• EXP
+	• FLOOR
+	• HEXTORAW
+	• INSTR
+	• INSTRB
+	• INSTRC
+	• INSTR2
+	• INSTR4
+	• IS [NOT] INFINITE
+	• IS [NOT] NAN
+	• LENGTH
+	• LENGTH2
+	• LENGTH4
+	• LENGTHB
+	• LENGTHC
+	• LN
+	• LOG
+	• LOWER
+	• LPAD
+	• LTRIM
+	• MOD
+	• NVL
+	• POWER
+	• RAWTOHEX
+	• REM
+	• REMAINDER
+	• REPLACE
+	• ROUND
+	• RPAD
+	• RTRIM
+	• SIGN
+	• SIN
+	• SINH
+	• SQRT
+	• SUBSTR
+	• SUBSTR2
+	• SUBSTR4
+	• SUBSTRB
+	• SUBSTRC
+	• TAN
+	• TANH
+	• TO_BINARY_DOUBLE
+	• TO_BINARY_FLOAT
+	• TO_CHAR
+	• TO_NUMBER
+	• TRIM
+	• TRUNC
+	• UPPER
+	Static expressions can be used in the following subtype declarations:
+	• Length of string types (VARCHAR2, NCHAR, CHAR, NVARCHAR2, RAW, and the ANSI
+	equivalents)
+	• Scale and precision of NUMBER types and subtypes such as FLOAT
+	• Interval type precision (year, month ,second)
+	• Time and Timestamp precision
+	• VARRAY bounds
+	• Bounds of ranges in type declarations
+	In each case, the resulting type of the static expression must be the same as the declared
+	item subtype and must be in the correct range for the context.
+
+
+2.7.9.1 PLS_INTEGER Static Expression 
+	PLS_INTEGER static expressions are:
+	. PLS_INTEGER literals 
+	. PLS_INTEGER static constants 
+	
+2.7.9.2 BOOLEAN Static Expression 
+	BOOLEAN static expressions are:
+	. BOOLEAN literals (TRUE, FALSE, or NULL)
+	. BOOLEAN static constants 
+	. Where x and y are PLS_INTEGER static expressions:
+	- x > y 		- x >= y 		- x = y 
+	- x < y 		- x <= y 		- x <> y 
+	. Where x and y are BOOLEAN expression 
+	- NOT y			- x AND y 		- x OR y 
+	- x > y 		- x >= y 		- x = y 
+	- x < y 		- x <= y 		- x <> y 
+	.Where x is static expression 
+	- x IS NULL 
+	- x IS NOT NULL 
+	
+2.7.9.3	VARCHAR2 Static Expressions 
+	VARCHAR2 static expressions are:
+	. String literals with maximum size of 32,767 bytes 
+	. NULL 
+	. TO_CHAR(x), where x is a PLS_INTEGER static expression 
+	. TO_CHAR(x, f, n) where x is a PLS_INTEGER static expression and f and n are VARCHR2 static expression 
+	. x || y where x and y are VARCHAR2 or PLS_INTEGER static expressions 
+	
+2.7.9.4 Static Constant 
+	A static constant id declared in a package speficiation with this syntax. 
+	
+	constant_name CONSTANT data_type := static_expression;
+	
+	The type of static_expression must be the same as data_type (either BOOLEAN or PLS_INTEGER).
+	
+	The static constant must always be referenced as package_name.constant_name, even in the 
+	body of the package_name package.
+	
+	Example 2.54 Static Constants 
+	
+	CREATE PACKAGE my_debug IS 
+		debug CONSTANT BOOLEAN := TRUE;
+		tracr CONSTANT BOOLEAN := TRUE;
+	END my_debug;
+	/
+	
+	CREATE PROCEDURE my_proc1 AUTHID DEFINER IS 
+	BEGIN 
+		$IF my_debug.debug $THEN 
+			DBMS_OUTPUT.PUT_LINE('Debugging ON');
+		$ELSE 
+			DBMS_OUPUT.PUT_LINE('Debugging OFF');
+		$END 
+	END my_proc1;
+	/
+	
+	CREATE PROCEDURE my_proc2 AUTHID DEFINER IS 
+	BEGIN 
+		$IF my_debug.trace $THEN 
+			DBMS_OUPUT.PUT_LINE('Tracing ON');
+		$ELSE 
+			DBMS_OUPUT.PUT_LINE('Tracing OFF');
+		$END 
+	END my_proc2;
+	/
+
+2.8 Error-Reporting Functions 
+	PL/SQL has two error-reporting functions SQLCODE and SQLERRM, for use in PL/SQL exception-handling code.
+	we can not use the SQLCODE and SQLERRM functions in SQL Statements.
+	
+	
+2.9 Conditional COmpilation 
+	Conditional compilation lets us costomize the functionality of a PL/SQL application without removing source text.
+	
+	For example, you can:
+	• Use new features with the latest database release and disable them when running the
+	  application in an older database release.
+	• Activate debugging or tracing statements in the development environment and hide them
+      when running the application at a production site
+	  
+2.9.1 How Conditional Compilation Works 
+	Conditional compilation uses selection directives, which are similar to IF statement, to select sorce text for compilation.
+	
+	The condition in a selection directive usually includes an inquiry directive. Error Directives raise 
+	user-defined errors. All conditional compilation directives are built from preprocessor control tokens and PL/SQL text.
+	
+2.9.1.1 Preprocessor Control Token 
+	A preprocessor control token indentifies code that is processed befire the PL/SQL unit is compiled.
+	
+	Syntax: 
+	$plsql_identifier 
+	There can not be space between $ and plsql_identifier.
+	
+	The character $ can also appear inside plsql_identifier, but it has no special meaning.
+	
+	These preprocessor control tokens are reserved. 
+	
+	. $IF
+	. $THEN 
+	. $ELSE 
+	. $ELSIF 
+	. $ERROR 
+	
+2.9.1.2. Selection Directives 
+	A selection directive selects source text to compile. 
+	
+	Syntax: 
+	$IF boolean_static_expression $THEN 
+		text 
+	[ $ELSIF boolean_static_expression $THEN
+		text 
+	]
+	[ $ELSE
+		text 
+	  $END
+	]
+	
+	
+2.9.1.3 Error Directives 
+	An error directive produces a user-defined error message during compilation.
+	
+	Syntax: 
+	$ERROR varchar2_static_expression $END 
+	
+	It produces this compile-time error message, where string is the value of 
+	varchar2_static_expression:
+	
+	PLS-00179: $ERROR: string 
+	
+2.9.1.4 Inquiry Directives 
+	An inquiry directive provides information about the compilation enviroment.
+	syntax: 
+	$$name 
+	
+2.9.1.4.1 Predefined Inquiry Directives
+	The predefined inquiry directives are:
+	. $$PLSQL_LINE 
+		A PLS_INTEGER literal whose value is the number of the source line on which the directive
+		appears in the current PL/SQL unit. An example of $$PLSQL_LINE in a selection directive
+		is:
+		$IF $$PLSQL_LINE = 32 $THEN ...
+	• $$PLSQL_UNIT
+		A VARCHAR2 literal that contains the name of the current PL/SQL unit. If the current
+		PL/SQL unit is an anonymous block, then $$PLSQL_UNIT contains a NULL value.
+	• $$PLSQL_UNIT_OWNER
+		A VARCHAR2 literal that contains the name of the owner of the current PL/SQL unit.
+		If the current PL/SQL unit is an anonymous block, then $$PLSQL_UNIT_OWNER
+		contains a NULL value.
+	• $$PLSQL_UNIT_TYPE
+		A VARCHAR2 literal that contains the type of the current PL/SQL unit—ANONYMOUS
+		BLOCK, FUNCTION, PACKAGE, PACKAGE BODY, PROCEDURE, TRIGGER, TYPE, or TYPE BODY.
+		Inside an anonymous block or non-DML trigger, $$PLSQL_UNIT_TYPE has the value
+		ANONYMOUS BLOCK.
+	• $$plsql_compilation_parameter
+		The name plsql_compilation_parameter is a PL/SQL compilation parameter (for
+		example, PLSCOPE_SETTINGS). For descriptions of these parameters
+	
+	Example 2-55 Predefined Inquiry Directives 
+	
+	CREATE OR REPLACE PROCEDURE p 
+	AUTHID DEFINER IS 
+		i PLS_INTEGER;
+	BEGIN 
+		DBMS_OUPUT.PUT_LINE('Inside p');
+		i := $$PLSQL_LINE 
+		DBMS_OUPUT.PUT_LINE('i = '|| i);
+		DBMS_OUPUT.PUT_LINE('$$PLSQL_LINE = ' || $$PLSQL_LINE);
+		DBMS_OUTPUT.PUT_LINE('$$PLSQL_UNIT = '|| $$PLSQL_UNIT);
+		DBMS_OUTPUT.PUT_LINE('$$PLSQL_UNIT_OWNER = '|| $$PLSQL_UNIT_OWNER);
+		DBMS_OUTPUT.PUT_LINE('$$PLSQL_UNIT_TYPE = '|| $$PLSQL_UNIT_TYPE);
+	END;
+	/
+	
+	BEGIN 
+		p;
+		DBMS_OUPUT.PUT_LINE('Outside p');
+		DBMS_OUPUT.PUT_LINE('$$PLSQL_LINE = ' || $$PLSQL_LINE);
+		DBMS_OUTPUT.PUT_LINE('$$PLSQL_UNIT = '|| $$PLSQL_UNIT);
+		DBMS_OUTPUT.PUT_LINE('$$PLSQL_UNIT_OWNER = '|| $$PLSQL_UNIT_OWNER);
+		DBMS_OUTPUT.PUT_LINE('$$PLSQL_UNIT_TYPE = '|| $$PLSQL_UNIT_TYPE);
+	END;
+	/
+	
+	
+	Example 2-56 Displaying Vlaues of PL/SQL compilation Parameter.
+	
+	BEGIN 
+		DBMS_OUTPUT.PUT_LINE('$$PLSCOPE_SETTINGS = ' || $$PLSCOPE_SETTINGS);
+		DBMS_OUTPUT.PUT_LINE('$$PLSQL_CCFLAGS = ' || $$PLSQL_CCFLAGS);
+		DBMS_OUTPUT.PUT_LINE('$$PLSQL_CODE_TYPE = ' || $$PLSQL_CODE_TYPE);
+		DBMS_OUTPUT.PUT_LINE('$$PLSQL_OPTIMIZE_LEVEL = ' || $$PLSQL_OPTIMIZE_LEVEL);
+		DBMS_OUTPUT.PUT_LINE('$$PLSQL_WARNINGS = ' || $$PLSQL_WARNINGS);
+		DBMS_OUTPUT.PUT_LINE('$$NLS_LENGTH_SEMANTICS = ' || $$NLS_LENGTH_SEMANTICS);
+	END;
+	/
+	
+	
+2.9.2 COnditional Compilation Example 
+	This example generates an error message if the database version and release is less than
+	Oracle Database 10g release 2; otherwise, it displays a message saying that the version and
+	release are supported and uses a COMMIT statement that became available at Oracle
+	Database 10g release 
+	
+	BEGIN 
+		$IF DBMS_DB_VERSION.VER_LE_10_1 $THEN -- selection directive begins 
+			$ERROR 'unsupported database release' $END  -- error directive 
+		$ELSE 
+			DBMS_OUTPUT.PUT_LINE(
+				'Release '|| DBMS_DB_VERSION.VERSION || '.' ||
+				DBMS_DB_VERSION.RELEASE || ' is supported.'
+				);
+		-- This COMMIT syntax is newly supported in 10.2:
+		COMMIT WRITE IMMEDIATE NOWAIT;
+		$END -- selection directive ends 
+	END;
+	/
+	
+	
+	Example 2.59 Compiling Different Code for Different Database Versions 
+	
+	ALTER SESSION SET PLSQL_CCFLAGS = 'my_debug:FALSE, my_tracing:FALSE';
+	
+	CREATE OR REPLACE PACKAGE my_pkg AUTHID DEFINER AS 
+	  SUBTYPE my_real IS 
+		$IF DBMS_DB_VERSION.VERSION < 10 $THEN 
+			NUMBER;
+		$ELSE 
+			BINARY_DOUBLE;
+		$END 
+		
+		my_pi my_real;
+		my_e  my_real;
+	END my_pkg;
+	/
+	
+	CREATE OR REPLACE PACKAGE BODY my_pkg AS 
+	BEGIN 
+		$IF DBMS_DB_VERSION.VERSIOn < 10 $THEN 
+			my_pi := 3.141592;
+			my_e  := 2.71828;
+		$ELSE 
+			my_pi := 3.141592d;
+			my_e  := 2.7182828d;
+		$END 
+	END my_pkg;
+	/
+	
+	CREATE OR REPLACE PROCEDURE circle_area(radius my_pkg.my_real) 
+	AUTHID DEFINER IS 
+		my_area  my_pkg.my_real;
+		my_data_type VARCAHR2(30);
+	BEGIN 
+		my_area := my_pkg.my_pi * (radius ** 2);
+		
+		DBMS_OUTPUT.PUT_LINE
+			('Radius: '|| TO_CHAR(radius) || ' Area: '|| TO_CHAR(my_area));
+		
+		$IF $$my_debug $THEN 
+			SELECT DATA_TYPE INTO my_data_type
+			FROM USER_ARGUMENTS 
+			WHERE OBJECT_NAME = 'CIRCLE_AREA'
+			AND ARGUMENT_NAME = 'RADIUS';
+			
+			DBMS_OUTPUT.PUT_LINE
+				('Data type of the RADIUS argument is: '|| my_data_type);
+		$END 
+	END;
+	/
+	
+	
+2.93 Retrieving and Printing Post-Processes Source Text 
+
+	The DBMS_PREPROCESSOR package provides subprograms that retrive and print the source text of a 
+	PL/SQL unit in its post-processed form.
+	
+	Example 2-60 Displaying Post-Processed Textsource text 
+	
+	CALL DBMS_PREPROCESSOR.PRINT_POST_PROCESSED_SOURCE (
+		'PACKAGE', 'HR', 'MY_PKG'
+		);
+		
+2.9.4 Conditional Compilation Directive Restrictions 
+
+			
+	Example 2-61 Using Conditinal Compilation Directive in the Defenition of a Package SPecification.
+	
+	CREATE OR REPLACE PACKAGE cc_pkg 
+	AUTHID DEFINER 
+	$IF $$XFLAG $THEN ACCESSIBLE BY(p1_pkg) $END 
+	IS 
+		i NUMBER := 10;
+		trace CONSTANT BOOLEAN := TRUE; 
+	END cc_pkg;
+	
+	Example 2.62 Using COnditional Compilation Directive in the Formal Parameter List 
+	of a Subprogram.
+	
+	CREATE OR REPLACE PROCEDURE py_proc(
+		$IF $$xxx $THEN i IN PL_INTEGER $ELSE i IN INTEGER $END
+		) IS 
+	BEGIN 
+		NULL;
+	END my_proc;
+	
+	
+	
+		
+			
+	
+		
+		
+
+ 
+
+
+	
+	
+	
+	
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

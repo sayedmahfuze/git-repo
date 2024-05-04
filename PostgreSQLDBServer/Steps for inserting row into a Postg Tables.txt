@@ -1,0 +1,119 @@
+Steps for inserting one row into a PostgreSQL table
+To insert a row into a PostgreSQL table in Python, you use the following steps:
+
+First, connect to the PostgreSQL database server by calling the connect() function of the psycopg module.
+
+conn = psycopg2.connect(dsn)
+Code language: Python (python)
+The connect() function returns a new instance of the connection class.
+
+Next, create a new cursor object by calling the cursor() method of the connection object.
+
+cur = conn.cursor()
+Code language: Python (python)
+Then, execute the INSERT statement with the input values by calling the execute() method of the cursor object.
+
+cur.execute(sql, (value1,value2))
+Code language: Python (python)
+You pass the INSERT statement to the first parameter and a list of values to the second parameter of the execute() method.
+
+In case the primary key of the table is a serial or identity column, you can get the generated ID back after inserting the row.
+
+To do this, you use the RETURNING id clause in the INSERT statement. After calling the execute() method, you call the  fetchone() method of the cursor object to get the id value like this:
+
+id = cur.fetchone()[0]
+Code language: Python (python)
+After that, call the commit() method of the connection object to permanently save the changes to the database.
+
+conn.commit()
+Code language: Python (python)
+If you forget to call the commit() method, psycopg2 will not make any changes to the table.
+
+Finally, close the connection to the PostgreSQL database server by calling the close() method of the cursor and connection objects.
+
+cur.close()
+conn.close()
+Code language: Python (python)
+Inserting one row into a PostgreSQL table example
+For the demonstration, we will use the vendors table in the suppliers table that we created in the creating table tutorial.
+
+vendors_table
+The following insert_vendor() function inserts a new row into the vendors table and returns the newly generated vendor_id value.
+
+#!/usr/bin/python
+
+import psycopg2
+from config import config
+
+
+def insert_vendor(vendor_name):
+    """ insert a new vendor into the vendors table """
+    sql = """INSERT INTO vendors(vendor_name)
+             VALUES(%s) RETURNING vendor_id;"""
+    conn = None
+    vendor_id = None
+    try:
+        # read database configuration
+        params = config()
+        # connect to the PostgreSQL database
+        conn = psycopg2.connect(**params)
+        # create a new cursor
+        cur = conn.cursor()
+        # execute the INSERT statement
+        cur.execute(sql, (vendor_name,))
+        # get the generated id back
+        vendor_id = cur.fetchone()[0]
+        # commit the changes to the database
+        conn.commit()
+        # close communication with the database
+        cur.close()
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+    finally:
+        if conn is not None:
+            conn.close()
+
+    return vendor_id
+Code language: Python (python)
+Inserting multiple rows into a PostgreSQL table example
+The steps for inserting multiple rows into a table are similar to the steps of inserting one row, except that in the third step, instead of calling the execute() method of the cursor object, you call the  executemany() method.
+
+For example, the following insert_vendor_list() function inserts multiple rows into the vendors table.
+
+def insert_vendor_list(vendor_list):
+    """ insert multiple vendors into the vendors table  """
+    sql = "INSERT INTO vendors(vendor_name) VALUES(%s)"
+    conn = None
+    try:
+        # read database configuration
+        params = config()
+        # connect to the PostgreSQL database
+        conn = psycopg2.connect(**params)
+        # create a new cursor
+        cur = conn.cursor()
+        # execute the INSERT statement
+        cur.executemany(sql,vendor_list)
+        # commit the changes to the database
+        conn.commit()
+        # close communication with the database
+        cur.close()
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+    finally:
+        if conn is not None:
+            conn.close()
+Code language: Python (python)
+To test the insert_vendor() and insert_vendor_list() functions, you use the following code snippet:
+
+if __name__ == '__main__':
+    # insert one vendor
+    insert_vendor("3M Co.")
+    # insert multiple vendors
+    insert_vendor_list([
+        ('AKM Semiconductor Inc.',),
+        ('Asahi Glass Co Ltd.',),
+        ('Daikin Industries Ltd.',),
+        ('Dynacast International Inc.',),
+        ('Foster Electric Co. Ltd.',),
+        ('Murata Manufacturing Co. Ltd.',)
+    ])

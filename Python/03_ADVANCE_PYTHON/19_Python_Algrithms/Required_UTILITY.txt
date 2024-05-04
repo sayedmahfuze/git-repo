@@ -1,0 +1,6 @@
+# ALL BROWSING DTL In CMD 
+C:\Windows\System32>ipconfig/displaydns
+ipconfig/displaydns
+
+# CROME 
+chrome://net-internals/?#dns 	

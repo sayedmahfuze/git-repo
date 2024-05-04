@@ -1,0 +1,147 @@
+# Django Installtion 
+
+# Run this command in CMD for Windows 
+
+> pip install django  (install django globally)
+
+# To check the Django 
+
+> pip freeze 
+
+
+# Creating a Django Project 
+
+> django-admin  (by pressing enter after this command we can see all the available option )
+
+
+Available subcommands:
+
+[django]
+    check
+    compilemessages
+    createcachetable
+    dbshell
+    diffsettings
+    dumpdata
+    flush
+    inspectdb
+    loaddata
+    makemessages
+    makemigrations
+    migrate
+    optimizemigration
+    runserver
+    sendtestemail
+    shell
+    showmigrations
+    sqlflush
+    sqlmigrate
+    sqlsequencereset
+    squashmigrations
+    startapp
+    startproject
+    test
+    testserver
+	
+> django-admin startproject mysite 
+
+
+# To Connect Virtual Environment
+D:\RoadMap\Jango_Flask\_Jango>pipenv shell
+Launching subshell in virtual environment...
+Microsoft Windows [Version 10.0.22621.2428]
+(c) Microsoft Corporation. All rights reserved.
+
+(_Jango-W-QE1le3) D:\RoadMap\Jango_Flask\_Jango>django-admin startproject wscubetech
+
+# To run the Django Project 
+# Go to the Directories where the Project folder is exists then run the below command.
+
+> python manager.py runserver
+
+
+(_Jango-W-QE1le3) D:\RoadMap\Jango_Flask\_Jango>cd wscubetech
+
+(_Jango-W-QE1le3) D:\RoadMap\Jango_Flask\_Jango\wscubetech>python manage.py runserver 9000
+Watching for file changes with StatReloader
+Performing system checks...
+
+System check identified no issues (0 silenced).
+
+You have 18 unapplied migration(s). Your project may not work properly until you apply the migrations for app(s): admin, auth, contenttypes, sessions.
+Run 'python manage.py migrate' to apply them.
+November 08, 2023 - 09:29:11
+Django version 4.2.7, using settings 'wscubetech.settings'
+Starting development server at http://127.0.0.1:9000/
+Quit the server with CTRL-BREAK.
+
+# Migrate/Migration the Default Database to the Project (SQLite)
+
+> python manage.py migrate 
+
+(_Jango) PS D:\RoadMap\Jango_Flask\_Jango\wscubetech> python manage.py migrate
+Operations to perform:
+  Apply all migrations: admin, auth, contenttypes, sessions
+Running migrations:
+  Applying contenttypes.0001_initial... OK
+  Applying auth.0001_initial... OK
+  Applying admin.0001_initial... OK
+  Applying admin.0002_logentry_remove_auto_add... OK
+  Applying admin.0003_logentry_add_action_flag_choices... OK
+  Applying contenttypes.0002_remove_content_type_name... OK
+  Applying auth.0002_alter_permission_name_max_length... OK
+  Applying auth.0003_alter_user_email_max_length... OK
+  Applying auth.0004_alter_user_username_opts... OK
+  Applying auth.0005_alter_user_last_login_null... OK
+  Applying auth.0006_require_contenttypes_0002... OK
+  Applying auth.0007_alter_validators_add_error_messages... OK
+  Applying auth.0008_alter_user_username_max_length... OK
+  Applying auth.0009_alter_user_last_name_max_length... OK
+  Applying auth.0010_alter_group_name_max_length... OK
+  Applying auth.0011_update_proxy_permissions... OK
+  Applying auth.0012_alter_user_first_name_max_length... OK
+  Applying sessions.0001_initial... OK
+(_Jango) PS D:\RoadMap\Jango_Flask\_Jango\wscubetech> 
+
+
+# Create Superuser in Django 
+
+> python manage.py createsuperuser 
+
+
+
+(_Jango-W-QE1le3) D:\RoadMap\Jango_Flask\_Jango\wscubetech>python manage.py
+createsuperuser
+Username (leave blank to use 'sayed'): admin
+Email address: test@gmail.com
+Password:
+Password (again):
+The password is too similar to the username.
+Bypass password validation and create user anyway? [y/N]: y
+Superuser created successfully.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

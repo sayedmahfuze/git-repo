@@ -1,0 +1,51 @@
+# NUMPY 
+# ADDING, REMOVING, and SORTING ELEMENTS IN AN ARRAY
+# This dection covers np.sort(), np.concatenate()
+
+# Sorting an element is simple with np.sort()
+# we can specify the axis, kind, and order 
+# when we call the function.
+import numpy as np 
+import os 
+
+os.system('cls')
+
+
+arr = np.array([2, 1, 5, 3, 7, 4, 6, 8])
+
+
+# we can quickly sort the numbers in ascending order with:
+
+print(np.sort(arr))
+
+# in addition to sort,
+# which returns a sorted copy of an array,
+# We can use:
+
+"""
+. argsort, which is an indirect sort along a specified axis
+. lexsort, which is an indirect stable sort on multiple keys
+. searchsorted, which will find elements in a sorted array, 
+. partition, which is a partial sort.
+
+"""
+
+a = np.array([1, 2, 3, 4])
+b = np.array([5, 6, 7, 8])
+
+# We can concatenate them with np.concatenate()
+
+c = np.concatenate((a, b))
+print(c)
+
+x = np.array([[1, 2], [3, 4]])
+y = np.array([[5, 6]]) # Array dimention should be same
+
+# We can concatenate with 
+
+z = np.concatenate((x, y), axis=0)
+print(z)
+
+
+
+

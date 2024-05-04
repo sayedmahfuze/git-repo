@@ -1,0 +1,10 @@
+import psycopg2 
+
+try:
+    conn = psycopg2.connect("host=localhost port=5432 user=postgres password=postgres db=postgres")
+    if conn:
+        print("Db Connected Succesfully.")
+except:
+    print("Please check the connection string.")
+    
+

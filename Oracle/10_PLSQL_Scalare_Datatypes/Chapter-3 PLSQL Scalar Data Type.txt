@@ -1,0 +1,428 @@
+# Chapter 3 
+# PL/SQL Data Types 
+
+Every PL/SQL constant, variable, parameter, and function returns value has a data type that
+determines its storage format and its valid values and operations.
+
+The PL/SQL scalar data types:
+. The SQL data types 
+. BOOLEAN 
+. PLS_INTEGER 
+. BINARY_INTEGER
+. REF CURSOR 
+. User-defined subtypes 
+
+3.1 SQL Data Types 
+
+Table 3-1 Data Types with Different Maximum Sizes in PL/SQL and SQL
+Data Type 			Maximum Size in PL/SQL 		Maximum Size in SQL
+CHAR 				32,767 bytes 				2,000 bytes
+NCHAR 				32,767 bytes 				2,000 bytes
+RAW 				32,767 bytes 				2,000 bytes2
+VARCHAR2 			32,767 bytes 				4,000 bytes2
+NVARCHAR2 			32,767 bytes 				4,000 bytes2
+LONG 				32,760 bytes 				2 gigabytes (GB) - 1
+LONG RAW 			32,760 bytes 				2 GB
+BLOB 				128 terabytes (TB) 			(4 GB - 1) * database_block_size
+CLOB 				128 TB 						(4 GB - 1) * database_block_size
+NCLOB 				128 TB 						(4 GB - 1) * database_block_size
+
+
+
+3.1.2 Additional PL/SQL COnstants for BINARY_FLOAT and BINARY_DOUBLE 
+	The SQL data types BINARY_FLOAT and BINARY_DOUBLE represent single-presision and 
+	double-precision.
+	
+3.1.3 Additional PL/SQL Subtypes of BINARy_FLOAT and BINARY_DOUBLE 
+	PL/SQL predefines these subtypes:
+	. SIMPLE_FLOAT a subtype of SQL data type BINARY_FLOAT 
+	. SIMPLE_DOUBLE a subtype of SQL data type BINARY_DOUBLE.
+	
+	Each subtype has the same range as its base type and has a NOT NULL constraint.
+	If we know that a variable will never have the value NULL, declare it as SIMPLE_FLOAT or SIMPLE DOUBLE.
+	
+	
+3.1.4 CHAR and VARCHAR2 Variables 
+
+3.1.4.1 Assigning or Inserting Too-Long Values 
+	If the value that we assign to a character variable or longer than the maximum size of 
+	the variable, an error occurs.
+	
+	DECLARE 
+		c VARCAHR2(3 CHAR);
+	BEGIN 
+		c = 'abc  ';
+	END;
+	/
+	
+	Result:
+	DECLARE
+	*
+	ERROR at line 1:
+	ORA-06502: PL/SQL: numeric or value error: character string buffer too small
+	ORA-06512: at line 4
+	
+	Similarly, if we insert a character variable into a column, and the value of the variable 
+	is longer than the defined width of the column, an error occurs. 
+	
+	DROP TABLE t 
+	CREATE TABLE t (c CHAR(3 CHAR));
+	
+	DECLARE 
+		s VARCHAR2(5 CHAR) := 'abc  ';
+	BEGIN
+		INSERT INTO t(c) values (s);
+	END;
+	/
+	
+	Result:
+	BEGIN
+	*
+	ERROR at line 1:
+	ORA-12899: value too large for column "HR"."T"."C" (actual: 5, maximum: 3)
+	ORA-06512: at line 4
+	
+	
+	To strip trailing blancks from a character value before assigning it to a variable or inserting it into a column.
+	use the RTRIM function.
+	
+	DECALRE 
+		c VARCAHR2(3 CHAR);
+	BEGIN 
+		c := RTRIM('abc  ');
+		INSERT INTO t(c) VALUES(RTRIM('abc   '));
+	END;
+	/
+	
+
+3.1.4.3.1 How Blank-Padding works 
+
+	Example 3-1 CHAR and VARCAHR2 blank-padding difference 
+	
+	DECLARE 
+		first_name CHAR(10 CHAR);
+		last_name  VARCHAR2(10 CHAR);
+	BEGIN 
+		first_name := 'Jhon  ';
+		last_name := 'Chen  ';
+		
+		DBMS_OUTPUT.PUT_LINE('*' || first_name ||'*');
+		DBMS_OUTPUT.PUT_LINE('*' || last_name ||'*');
+	END;
+	/
+	
+3.2 BOOLEAN Data Type 
+	The PL/SQL data type BOOLEAN stores logical values, which are the BOOLEAN values 
+	TRUE and FALSE and the value NULL. NULL represents an unknown value.
+	
+	The syntax
+	variable_name BOOLEAN;
+	
+	The only value that can assign to a BOOLEAN variable is a BOOLEAN expression.
+	
+	Because SQL has no data type equivalent to BOOLEAN, we can not:
+		. Assign a BOOLEAN value to a database table column.
+		. Select or fetch the value of a database table column into a BOOLEAN variable 
+		. Use a BOOLEAN value in a SQL function 
+		. Use a BOOLEAN expression in a SQL statement, except as an argument to a PL/SQL 
+		  function invoked in a SQL query, or in a PL/SQL anonymous block.
+		
+	We can not pass a BOOLEAN value to the DBMS_OUTPUT or DBMS_OUTPUT.PUTLINE subprogram.
+	To print a BOOLEAN value use an IF or CASE statement to translate it to a character value.
+	
+	Example 3-2 Printing BOOLEAN Values 
+	
+	PROCEDURE print_boolean (b BOOLEAN)
+	AUTHID DEFINER 
+	AS 
+	BEGIN 
+		DBMS_OUTPUT.PUT_LINE(
+		CASE 
+			WHEN b IS NULL THEN 'Unknown'
+			WHEN b THEN 'Yes'
+			WHEN NOT b THEN 'No'
+		END 
+		);
+	END;
+	/
+	
+	BEGIN 
+		print_boolean(TRUE);
+		print_boolean(FALSE);
+		print_boolean(NULL);
+	END;
+	/
+	
+	
+	Example 3-3 SQL Statement Invokes PL/SQL functions with BOOLEAN Parameter 
+	
+	FUNCTION f (x BOOLEAN, y PLS_INTEGER)
+	RETURN employee.employee_id%TYPE 
+	AUTHID CURRENT_USER AS 
+	BEGIN 
+		IF x THEN 
+			RETURN y;
+		ELSE 
+			RETURN 2 * y;
+		ENd IF;
+	END;
+	/
+	
+	DECLARE 
+		name employee_last_name%TYPE;
+		b BOOLEAN := TRUE;
+	BEGIN 
+		SELECT last_name INTO name 
+		FROM employee 
+		WHERE employee_id = f(b, 100);
+		
+		DBMS_OUTPUT.PUT_LIINE(name);
+		
+		b := FALSE 
+		
+		SELECT last_name INTO name 
+		FROM employees 
+		WHERE employee_id = f(b, 100);
+		
+		DBMS_OUTPUT.PUT_LINE(name);
+	END;
+	/
+	
+
+3.3 PLS_INTEGER and BINARY_INTEGER Data Types 
+	The PL/SQL data types PLS_INTEGER and BINARY_INTEGER are identical.
+	The PLS_INTEGER data type stores signed integer in the the range -2,147,483,648 through 2,147,383,647, 
+	represented in 32 butes.
+	
+	The PLS_INTEGER data type has thes advantage over the NUMBER data type and NUMBER subtype:
+	. PLS_INTEGER values requires less storage.
+	. PLS_INTEGER operations use hardware arithmetic, so they are faster than NUMBER operaton, 
+	  which use library arithmetic.
+	  
+	For efficiency, use PLS_INTEGER values for all calcumations in its range.
+	
+	
+3.3.1 Preventing PLS_INTEGER Overflow 
+	A calculation with two PLS_INTEGER values that overflow the PLS_INTEGER range raise 
+	an overflow exception.
+	For calculation outside the PLS_INTEGER range, use INTEGER, a predefined subtype of 
+	the NUMBER data type.
+	
+	Example 3-4 PLS_INTEGER calculation Raise Overflow Exception 
+	
+	DECLARE 
+		p1 PLS_INTEGER := 2147483647;
+		p2 PLS_INTEGER := 1;
+		n NUMBER;
+	BEGIN
+		n := p1 + p2;
+	END;
+	/
+	
+	Example 3-5 Preventing Overflow 
+	
+	DECALRE 
+		p1 PLS_INTEGER := 2147483647;
+		p2 INTEGER := 1;
+		n NUMBER;
+	BEGIN 
+		n := p1 + p2;
+	END;
+	/
+	
+
+3.3.2 Predefined PLS_INTEGER Subtypes 
+	Table 3-3 Predefined Subtypes of PLS_INTEGER Data Type
+	Data Type 			Data Description
+	NATURAL 			Nonnegative PLS_INTEGER value
+	NATURALN 			Nonnegative PLS_INTEGER value with NOT NULL constraint
+	POSITIVE 			Positive PLS_INTEGER value
+	POSITIVEN 			Positive PLS_INTEGER value with NOT NULL constraint
+	SIGNTYPE 			PLS_INTEGER value -1, 0, or 1 (useful for programming tri-state logic)
+	SIMPLE_INTEGER 		PLS_INTEGER value with NOT NULL constraint
+	
+	
+	PLS_INTEGER and its subtype can be implicitly converted to these data types:
+	. CHAR 
+	. VARCAHR2 
+	. NUMBER 
+	. LONG 
+	
+	Exaxmple 3-6 Voilating Constraint of SIMPLE_INTEGER Subtype 
+	
+	DECALRE 
+		a SIMPLE_INTEGER := 1;
+		b PLS_INTEGER := NULL;
+	BEGIN 
+		a := b;
+	END;
+	/
+	
+3.3.3 SIMPLE_INTEGER Subtype of PLS_INTEGER 
+	SIMPLE_INTEGER is a predefined subtype of the PLS_INTEGER data type.
+	SIMPLE_INTEGER has the same range as PLS_INTEGER and has a NOT NULL contraint.
+	It differs significantly from PLS_INTEGER in its overflow semantics.
+	
+3.3.3.1 SIMPLE_INTEGER Overflow Semantics 
+	If and only of all operands in an expression have the data type SIMPLE_INTEGER, PL/SQL uses
+	two's complement arithmetic and ignores overflow.
+	
+	Because overflows are ignored, values can warp from positive to negative or from negative to 
+	positive.
+	
+	Example 
+	DECLARE 
+		n SIMPLE_INTEGER := 2147483645;
+	BEGIN 
+		FOR j IN 1..4 LOOP
+			DBMS_OUTPUT.PUT_LINE(TO_CHAR(n, 'S9999999999'));
+		END LOOP;
+		
+		FOR j IN 1..4 LOOP 
+			DBMS_OUTPUT.PUT_LINE(TO_CHAR(n, 'S9999999999'));
+		END LOOP;
+	END;
+	/
+	
+	
+3.4 USER-DEFINED PL/SQL Subtypes 
+	PL/SQL lets us to define our own subtypes.
+	The base type can be any scalar or user-defined PL/SQL data types specifier such as 
+	CHAR, DATE or RECORD.
+	
+	Subtypes can:
+	. Provide compatibility with ANSI/ISO data types
+	. Show the intended use of data items of that type 
+	. Detect out-of-range values 
+	
+3.4.1 Unconstrained Subtype 
+	An unconstrained subtype has the same set of values as its base type. so it is only
+	another name for the base type.
+	
+	Therefore, unconstrained subtype of the same base type are interchangeable with 
+	each other and with the base type. No data type conversion occurs.
+	
+	To define an unconstrained subtype, use the syntax:
+	SUBTYPE subtype_name IS base_type 
+	
+	Example: 
+	SUBTYPE "DOUBLE PRECISION" IS FLOAT 
+	
+	Example 3-7 User-Defined Unconstrained Subtype Show Intended Use 
+	
+	DECLARE 
+		SUBTYPE Balance IS NUMBER;
+		
+		checking_account 	Balance(6, 2);
+		saving_account		Balance(8, 2);
+		certificate_of_deposit	Balance(8, 2);
+		max_insured CONSTANT Balance(8, 2) := 250000.00;
+		
+		SUBTYPE Counter IS NATURAL;
+		
+		accounts	Counter := 1; 
+		deposite	Counter := 0;
+		withdrawals	Counter := 0;
+		overdraft	Counter := 0;
+		
+		PROCEDURE deposit (
+			account IN OUT Balance,
+			amount	IN	   Balance
+		) IS 
+		BEGIN 
+			account := account + amount;
+			deposits := deposits + 1;
+		END;
+	BEGIN 
+		NULL;
+	END;
+	/
+	
+
+3.4.2 Constrained Subtype 
+	A constrained subtype has only a subtype of the values of its base type.
+	
+	If the base type lets us specify zise, precision and scale, or a range of values, then we can  
+	specify them for its subtypes. 
+	Syntax: 
+	SUBTYPE subtype_name IS BASE_TYPE 
+		{predision [, scale] | RANGE low_value .. high_value} [NOT NULL]
+	
+	Otherwise, the only constraint that we can put on its subtype is NOT NULL.
+	
+	SUBTYPE subtype_name IS BASE_TYPE [NOT NULL]
+	
+	Note: The only base types for which we can specify a range of values are PLS_INTEGER 
+	and its subtype.
+	
+	A constrained subtype can be implicitly converted to its base type, but the base type can be
+	implicitly converted to the constrained subtype only if the value does not violate a constraint
+	of the subtype.
+	A constrained subtype can be implicitly converted to another constrained subtype with the
+	same base type only if the source value does not violate a constraint of the target subtype.
+	
+	Example 3-8 User-Defined Constrained SUbtype Detects Out-Of Range Vlaues 
+	
+	DECLARE 
+		SUBTYPE Balance IS NUMBER(8, 2);
+		
+		checking_account	Balance;
+		savings_account		Balance;
+		
+	BEGIN 
+		checking_account := 2000.00;
+		savings_account  := 1000000.00;
+	END;
+	/
+	
+	Example 3-9 Implicit Conversion Between Constrained Subtype with Same Base type 
+	
+	DECLARE 
+		SUBTYPE Digit		    IS PLS_INTEGER RANGE 0..9;
+		SUBTYPE Double_digit	IS PLS_INTEGER RANGE 10..99;
+		SUBTYPE Under_100		IS PLS_INTEGER RANGE 0..99;
+		
+		d 	Degit		:= 4;
+		dd 	Double_digit	:= 35;
+		u 	Under_100;
+	BEGIN 
+		u := d; 	-- Success
+		u := dd; 	-- Success 
+		dd := d ; 	-- Raise Error
+		
+	END;
+	/
+	
+3.4.3 Subtype With Base Types in Same Data Type Family 
+	If two subtype have different base types in the same data type family, then one subtype can 
+	be implicitly converted to the other only if the source value does not violate a constraint 
+	of the target subtype.
+	
+	Example 3-10 Implicit Conversion Between Subtype with Base Types in Same Family.
+	
+	DECLARE 
+		SUBTYPE		Word IS CHAR(6);
+		SUBTYPE		Text IS VARCAHR2(15);
+		
+		verb		Word := 'run';
+		sentence1	Text;
+		sentence2	Text := 'Hurry!';
+		sentence3	Text := 'See Tom run.';
+	BEGIN 
+		sentence1 	:= verb; 
+		verb 		:= sentence2; 
+		verb 		:= sentence3;  -- Error 
+	END;
+	/
+	
+	
+	
+		
+		
+		
+		
+			
+		
+	
+	
+	
