@@ -1,0 +1,99 @@
+Parallel Scans in PostgreSQL with examples
+ChatGPT
+Parallel scans in PostgreSQL allow the database to execute certain types of queries using multiple CPU cores, significantly speeding up query execution times for large datasets. This feature is especially useful for operations like table scans, index scans, and joins. Parallelism in PostgreSQL is achieved through the use of worker processes that perform parts of the query execution in parallel.
+
+Here's a detailed explanation of how parallel scans work in PostgreSQL, followed by some examples.
+
+How Parallel Scans Work
+Parallel Seq Scan: This is the parallel version of a sequential scan. Instead of scanning the entire table with a single process, the table is divided into chunks that multiple worker processes scan concurrently.
+
+Parallel Index Scan: Similar to a sequential scan but using an index. Multiple worker processes scan different parts of the index simultaneously.
+
+Parallel Bitmap Heap Scan: This uses a bitmap index scan to identify the tuples to be fetched. The heap scan phase can be parallelized.
+
+Parallel Join: PostgreSQL can perform joins in parallel if the join conditions and data distribution support it.
+
+Enabling Parallel Queries
+Parallel query execution in PostgreSQL is controlled by several configuration parameters:
+
+max_parallel_workers_per_gather: Sets the maximum number of workers that can be used for a single parallel operation.
+max_parallel_workers: Sets the maximum number of workers that the entire PostgreSQL instance can use.
+parallel_tuple_cost and parallel_setup_cost: These parameters influence the planner's decision to use parallel execution by estimating the cost.
+Example 1: Parallel Sequential Scan
+Consider a large table orders with millions of rows. You want to perform a full table scan to find orders above a certain value.
+
+First, ensure parallelism is configured appropriately:
+
+sql
+Copy code
+SET max_parallel_workers_per_gather = 4; -- Up to 4 workers for parallel queries
+Now, execute the query:
+
+sql
+Copy code
+EXPLAIN ANALYZE
+SELECT * FROM orders WHERE order_value > 1000;
+You should see a plan indicating a parallel sequential scan, such as:
+
+yaml
+Copy code
+Gather
+  Workers Planned: 4
+  ->  Parallel Seq Scan on orders
+        Filter: (order_value > 1000)
+Example 2: Parallel Index Scan
+Assume you have an index on the order_date column of the orders table. You can use a parallel index scan to fetch orders from a specific date range.
+
+sql
+Copy code
+EXPLAIN ANALYZE
+SELECT * FROM orders WHERE order_date BETWEEN '2023-01-01' AND '2023-12-31';
+The execution plan might show something like:
+
+csharp
+Copy code
+Gather
+  Workers Planned: 4
+  ->  Parallel Index Scan using orders_order_date_idx on orders
+        Index Cond: (order_date >= '2023-01-01' AND order_date <= '2023-12-31')
+Example 3: Parallel Bitmap Heap Scan
+For more complex conditions, a parallel bitmap heap scan can be used:
+
+sql
+Copy code
+EXPLAIN ANALYZE
+SELECT * FROM orders WHERE customer_id = 12345 AND order_value > 500;
+The plan might include:
+
+mathematica
+Copy code
+Gather
+  Workers Planned: 4
+  ->  Parallel Bitmap Heap Scan on orders
+        Recheck Cond: (customer_id = 12345 AND order_value > 500)
+        ->  Bitmap Index Scan on orders_customer_id_order_value_idx
+              Index Cond: (customer_id = 12345 AND order_value > 500)
+Example 4: Parallel Join
+Parallel joins can be executed when joining large tables. Suppose you have two large tables, orders and customers, and you want to join them:
+
+sql
+Copy code
+EXPLAIN ANALYZE
+SELECT o.*, c.*
+FROM orders o
+JOIN customers c ON o.customer_id = c.customer_id
+WHERE o.order_value > 1000;
+The plan might show:
+
+mathematica
+Copy code
+Gather
+  Workers Planned: 4
+  ->  Hash Join
+        Hash Cond: (o.customer_id = c.customer_id)
+        ->  Parallel Seq Scan on orders o
+              Filter: (order_value > 1000)
+        ->  Hash
+              ->  Seq Scan on customers c
+Conclusion
+Parallel scans in PostgreSQL can significantly improve the performance of queries on large datasets by leveraging multiple CPU cores. By configuring the relevant settings and understanding how to read execution plans, you can optimize your queries to take advantage of parallel execution capabilities.

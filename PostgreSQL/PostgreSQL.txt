@@ -1,0 +1,46 @@
+--# PostgreSQL Functions and Operators:
+
+. The psql commands \df and \do can be used to list all available functions and operators, respectively
+
+. repeat ( text, integer ) → text 
+. repeat('Pg', 4) → PgPgPgPg 
+
+
+9.1 Logical Operators:
+	. boolean AND boolean → boolean
+	. boolean OR boolean → boolean
+	. NOT boolean → boolean
+
+9.2 Comparison Operator:
+	. Less than  "<"
+	. Greater Tahn  ">"
+	. Less than or equal to "<="
+	. Greater than or equal to ">="
+	. Equal "="
+	. Not equal "<>"
+	. Not equal "!="
+
+Note: <> is the standard SQL notation for “not equal”. != is an alias, which is converted to <> at
+a very early stage of parsing. Hence, it is not possible to implement != and <> operators that
+do different things.
+
+How to optimize query performance in PostgreSQL?
+Hide answer
+
+Query performance optimization is an important aspect of database administration. There are several methods to optimize query performance in PostgreSQL, including:
+
+Indexes: Indexes are data structures that allow fast access to data. By creating an index on columns used in WHERE clauses, JOIN conditions, and ORDER BY clauses, you can improve query performance. To create an index, you can use the following command:
+
+CREATE INDEX index_name ON table_name (column1, column2);
+Explain plan: The EXPLAIN command allows you to view the execution plan for a query. The execution plan shows the steps that the database will take to execute the query, including the use of indexes, sorts, and scans. To view the execution plan for a query, you can use the following command:
+
+EXPLAIN SELECT * FROM table_name WHERE column1 = 'value';
+Table partitioning: Partitioning large tables into smaller, more manageable pieces can improve query performance. PostgreSQL supports table partitioning through its table inheritance feature. To partition a table, you can create child tables that inherit from the parent table, and use constraints to ensure that data is stored in the appropriate child table.
+Materialized Views: Materialized views are precomputed views that can be used to improve query performance by reducing the amount of data that needs to be scanned. Materialized views are particularly useful for queries that aggregate data or perform complex calculations. To create a materialized view, you can use the following command:
+
+CREATE MATERIALIZED VIEW view_name AS SELECT column1, SUM(column2) FROM table_name GROUP BY column1;
+Configuration settings: There are several configuration settings in PostgreSQL that can be tuned to improve query performance. Some of the important settings include:
+shared_buffers: This setting controls the amount of memory used for caching data in the shared buffer cache. Increasing the value of this setting can improve performance for frequently accessed data.
+effective_cache_size: This setting represents the amount of memory available for caching data. This setting is used by the query planner to determine the optimal query plan.
+maintenance_work_mem: This setting controls the amount of memory used for maintenance operations, such as vacuum and index creation. Increasing the value of this setting can improve performance for these operations.
+work_mem: This setting controls the amount of memory used for each sort and hash operation. Increasing the value of this setting can improve performance for queries that require sorting or hashing.

@@ -1,0 +1,30 @@
+  DELETE FROM your_table
+WHERE ROWID NOT IN (
+    SELECT MIN(ROWID)
+    FROM your_table
+    GROUP BY column1, column2, ..., columnN
+);
+
+
+SELECT salary
+FROM (
+    SELECT salary, ROW_NUMBER() OVER (ORDER BY salary DESC) AS row_num
+    FROM your_table
+) ranked_salaries
+WHERE row_num = :n;
+
+
+SELECT department, salary
+FROM (
+    SELECT department, salary, ROW_NUMBER() OVER (PARTITION BY department ORDER BY salary DESC) AS row_num
+    FROM your_table
+) ranked_salaries
+WHERE row_num = 2;
+
+
+SELECT customer_id, order_id, order_date
+FROM (
+    SELECT customer_id, order_id, order_date, ROW_NUMBER() OVER (PARTITION BY customer_id ORDER BY order_date) AS row_num
+    FROM orders
+) first_orders
+WHERE row_num = 1;

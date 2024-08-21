@@ -1,0 +1,162 @@
+# Functions 
+
+Functions are similar to operators in that they manipulate data items and return a result
+A function without any arguments is similar to a pseudocolumn (refer to Pseudocolumns).
+However, a pseudocolumn typically returns a different value for each row in the result set,
+whereas a function without any arguments typically returns the same value for each row.
+
+SQL functions are built into Oracle Database and are available for use in various
+appropriate SQL statements. Do not confuse SQL functions with user-defined
+functions written in PL/SQL.
+If you call a SQL function with an argument of a data type other than the data type
+expected by the SQL function, then Oracle attempts to convert the argument to the
+expected data type before performing the SQL function.
+
+# Single-Row Functions 
+
+	- Numeric Functions 
+	- Character Functions Returning Character Values
+	- Character Functions Returning Number Valeus 
+	- Character Set Functions 
+	- Collection Functions 
+	- Datatime Functions
+	- General Compasison FUnctions 
+	- Conversion Functions 
+	- Large Object Functions 
+	- Collection Functions 
+	- Hierarchical Functions 
+	- Data Mining Functions 
+	- XML FUnctions 
+	- JSON Functions 
+	- Encoding and Decoding Function 
+	- NULL-Related Functions 
+	- Environment and Identifier FUnctions 
+	
+# Aggregate Functions 
+	Aggregate functions return a single result row based on groups of rows, rather than on 
+	single rows. Aggregate functions can appear in select list and in ORDER BY and HAVING
+	clause. 
+	They are commonly used with the GROUP BY clause in a SELECT statement,
+	where Oracle Database divides the rows of a queried table or view into groups. In a
+	query containing a GROUP BY clause, the elements of the select list can be aggregate
+	functions, GROUP BY expressions, constants, or expressions involving one of these.
+	Oracle applies the aggregate functions to each group of rows and returns a single
+	result row for each group.
+	If you omit the GROUP BY clause, then Oracle applies aggregate functions in the select
+	list to all the rows in the queried table or view. You use aggregate functions in the
+	HAVING clause to eliminate groups from the output based on the results of the
+	aggregate functions, rather than on the values of the individual rows of the queried
+	table or view.
+	- AVG
+	- COLLECT 
+	- CORR 
+	- COUNT 
+	- DENSE_RANK
+	- FIRST 
+	- GROUPING 
+	- LAST 
+	- LISTAGG 
+	- MAX
+	- MEDIAN 
+	- MIN 
+	- RANK 
+	- PERCENT_RANK 
+	- SUM 
+	
+	SELECT AVG(sal)
+	FROM   emp;
+	
+# Analytic Functions 
+	Analytic functions compute an aggregate value based on a group of rows. They differ
+	from aggregate functions in that they return multiple rows for each group. The group of
+	rows is called a window and is defined by the analytic_clause. For each row, a
+	sliding window of rows is defined. The window determines the range of rows used to
+	perform the calculations for the current row. Window sizes can be based on either a
+	physical number of rows or a logical interval such as time.
+	Analytic functions are the last set of operations performed in a query except for the
+	final ORDER BY clause. All joins and all WHERE, GROUP BY, and HAVING clauses are
+	completed before the analytic functions are processed. Therefore, analytic functions
+	can appear only in the select list or ORDER BY clause.
+	Analytic functions are commonly used to compute cumulative, moving, centered, and
+	reporting aggregates.
+	
+	arguments
+	Analytic functions take 0 to 3 arguments. The arguments can be any numeric data type or
+	any nonnumeric data type that can be implicitly converted to a numeric data type. 
+
+	analytic_clause
+	Use OVER analytic_clause to indicate that the function operates on a query result set.
+	This clause is computed after the FROM, WHERE, GROUP BY, and HAVING clauses. 
+	
+	query_partition_clause
+	Use the PARTITION BY clause to partition the query result set into groups based on one
+	or more value_expr. If you omit this clause, then the function treats all rows of the
+	query result set as a single group
+	
+	- AVG 
+	- COUNT 
+	- FIRST 
+	- LAST 
+	- RANK 
+	- DENSE_RANK 
+	- LAG 
+	- LEAD 
+	- MAX 
+	- MIN 
+	- NTH VALUE 
+	- SUM 
+	
+	SET PAGESIZE 50
+	BREAK ON deptno SKIP 1 DUPLICATES
+
+	SELECT empno, deptno, sal,
+       AVG(sal) OVER (PARTITION BY deptno) AS avg_dept_sal
+	FROM   emp;
+	
+	BREAK ON deptno SKIP 1 DUPLICATES
+
+	SELECT empno, deptno, sal, 
+       FIRST_VALUE(sal IGNORE NULLS) OVER (PARTITION BY deptno) AS first_sal_in_dept
+
+# Object Reference Functions 
+	Object reference functions manipulate REF values, which are references to objects of
+	specified object types. The object reference functions are:
+	- DEREF
+	- MAKE_REF
+	- REF
+	- REFTOHEX
+	- VALUE
+
+# Model Functions 
+	Model functions can be used only in the model_clause of the SELECT statement. The model
+	functions are:
+	- CV
+	- ITERATION_NUMBER
+	- PRESENTNNV
+	- PRESENTV
+	- PREVIOUS
+
+# OLAP Functions 
+	OLAP functions returns data from a dimensional object in two-dimension relational format.
+	The OLAP function is:
+	- CUBE_TABLE
+
+# Data Catridge Functions 
+	Data Cartridge functions are useful for Data Cartridge developers. The Data Cartridge
+	functions are:
+	- DATAOBJ_TO_MAT_PARTITION
+	- DATAOBJ_TO_PARTITION
+
+# User-Defined Functions 
+
+
+
+
+
+
+
+
+# About Queries and Subqueries
+	A query is an operation that retrieves data from one or more tables or views. In this
+	reference, a top-level SELECT statement is called a query, and a query nested within another
+	SQL statement is called a subquery.
